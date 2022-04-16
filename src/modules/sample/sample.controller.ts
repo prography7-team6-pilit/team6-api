@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
-@Controller('sample')
-export class SampleController {}
+@Controller({
+	version: '1',
+	path: 'sample',
+})
+export class SampleController {
+	@Get()
+	sample() {
+		return 'sample';
+	}
+}
