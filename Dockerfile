@@ -6,8 +6,8 @@ COPY . .
 WORKDIR server
 
 # build
-RUN yarn
-RUN yarn build
+RUN pnpm install
+RUN pnpm build
 
 # Start
-ENTRYPOINT [ "yarn", "run", "start:prod" ]
+ENTRYPOINT [ "pnpm", "start:prod" ]
