@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MessageQueueService } from './message_queue.service';
 
@@ -6,6 +7,9 @@ describe('MessageQueueService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports:[BullModule.registerQueue({
+        name:"message",
+      })],
       providers: [MessageQueueService],
     }).compile();
 
