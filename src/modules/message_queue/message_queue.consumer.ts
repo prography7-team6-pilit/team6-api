@@ -2,7 +2,7 @@ import { Job } from 'bull';
 import { Process, Processor } from '@nestjs/bull';
 
 @Processor('message')
-export class MsgConsumer {
+export class MessageQueueConsumer {
   @Process('transcode')
   handleTranscode(job: Job) {
     console.log("Start transcoding...");
