@@ -5,6 +5,5 @@ import { SampleModule } from './sample';
 
 @Module({
 	imports: [SampleModule,MessageQueueModule],
-
 })
 export class ApiModule {}
