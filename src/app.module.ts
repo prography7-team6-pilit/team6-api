@@ -1,7 +1,6 @@
 import { HealthCheckModule } from '@kiwi-lib/nestjs';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
 import { ApiModule } from './modules';
 
 @Module({
