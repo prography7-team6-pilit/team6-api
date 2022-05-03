@@ -4,9 +4,10 @@ import { MessageQueueService } from './message_queue.service';
 
 describe('MessageQueueService', () => {
   let service: MessageQueueService;
+  let module: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       imports:[BullModule.registerQueue({
         name:"message",
       })],
@@ -15,7 +16,9 @@ describe('MessageQueueService', () => {
 
     service = module.get<MessageQueueService>(MessageQueueService);
   });
-
+  afterEach(async ()=> {
+      await module.close();
+  });
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

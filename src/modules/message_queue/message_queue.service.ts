@@ -1,9 +1,9 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bull';
 
 @Injectable()
-export class MessageQueueService {
+export class MessageQueueService implements OnModuleDestroy{
     constructor(@InjectQueue('message') private msgq:Queue){}
 
     async addMsg(){
@@ -23,5 +23,9 @@ export class MessageQueueService {
         console.log(job);
         return job
     }
+
+    async onModuleDestroy() {
+        await this.msgq.close();
+      }
 
 }
