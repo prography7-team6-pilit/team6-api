@@ -1,14 +1,18 @@
+import { Job } from '@modules/repo/entity/job.entity';
+import { RepositoryService } from '@modules/repo/repo.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import { Queue } from 'bull';
+import Bull, { Queue } from 'bull';
+import { AddJob } from './dto/addjob.dto';
 
 @Injectable()
 export class MessageQueueService implements OnModuleDestroy{
-    constructor(@InjectQueue('message') private msgq:Queue){}
+    constructor(@InjectQueue('message') private msgq:Queue,
+    private readonly repo:RepositoryService){}
 
-    async addMsg(){
+    async addMsg(jobEntity:Job):Promise<Bull.JobId>{
         const job=await this.msgq.add('transcode',{
-            foo:'bar'
+            jobEntity
         });
         console.log(job);
         return job.id;
