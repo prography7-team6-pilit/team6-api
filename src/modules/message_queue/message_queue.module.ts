@@ -3,12 +3,15 @@ import { Module } from '@nestjs/common';
 import { MessageQueueConsumer } from './message_queue.consumer';
 import { MessageQueueController } from './message_queue.controller';
 import { MessageQueueService } from './message_queue.service';
+import { RepositoryModule } from '@modules/repo';
+
 
 @Module({
 	imports: [
+		RepositoryModule,
 		BullModule.registerQueue({
 			name: 'message',
-		}),
+		})
 	],
 	controllers: [MessageQueueController],
 	providers: [MessageQueueService,MessageQueueConsumer],
