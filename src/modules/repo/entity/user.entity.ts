@@ -1,19 +1,27 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Generated, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Eat } from './eat.entity';
+import { Job } from './job.entity';
 
 @Entity('User')
 export class User {
   @PrimaryGeneratedColumn()
-  userid: number;
+  userId:number;
 
   @Column({
-    type: 'text',
-    name: 'uuid',
+    unique:true
   })
-  name: string;
+  @Generated('uuid')
+  uuid: string;
 
   @Column({
     type: 'text',
     name: 'nickname',
   })
   nickname: string;
+
+  @OneToMany(()=>Job,(job)=>job.pillId,{ nullable: true })
+  job:Job[]
+
+  @OneToMany(()=>Eat,(eat)=>eat.eatId,{ nullable: true })
+  eat:Eat[]
 }
