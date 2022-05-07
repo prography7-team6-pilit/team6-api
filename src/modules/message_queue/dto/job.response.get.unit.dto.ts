@@ -1,8 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsMilitaryTime, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsEnum, IsMilitaryTime, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { Week } from "./enums/week.enum";
 
-export class AddJob {
+export class JobResponseUnitGetDto {
+  @ApiProperty({
+    description: 'Notification 고유번호',
+    example:"1"
+  })
+  @IsNotEmpty()
+  @IsString()
+  readonly jobId: number;
+
   @ApiProperty({
     description: 'Notification 제목',
     example:"띵동!"
@@ -24,13 +32,14 @@ export class AddJob {
     example:"10:24"
   })
   @IsNotEmpty()
-  @IsMilitaryTime()
+  @IsString()
   readonly jobTime: string;
 
   @ApiProperty({
     description: 'Notification 요일',
     isArray:true,
     enum: Week,
+    example:['Mon','Fri']
   })
   @IsEnum(Week,{each:true})
   readonly jobWeek:string[]
@@ -44,7 +53,7 @@ export class AddJob {
 
   @ApiProperty({
     description: 'Notificatino 약 고유번호',
-    example:10
+    example:1
   })
   @IsNumber()
   readonly pillId:number;
