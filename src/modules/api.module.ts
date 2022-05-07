@@ -4,11 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FirebaseCloudMessagingModule } from './firebase_cloud_messaging';
 import { MessageQueueModule } from './message_queue';
 import { PillManageModule } from './pill_manage/pill_manage.module';
+import { Eat } from './repo/entity/eat.entity';
 import { Job } from './repo/entity/job.entity';
 import { Pill } from './repo/entity/pill.entity';
 import { User } from './repo/entity/user.entity';
 import { RepositoryModule } from './repo/repo.module';
 import { SampleModule } from './sample';
+import { UserManageModule } from './user_manage';
 
 @Module({
 	imports: [
@@ -25,14 +27,15 @@ import { SampleModule } from './sample';
 			username: 'root',
 			password: 'root',
 			database: 'pillit',
-			entities: [Job,User,Pill],
+			entities: [Job,User,Pill,Eat],
 			synchronize: true,
 		  }),
 		  SampleModule,
 		  MessageQueueModule,
 		  FirebaseCloudMessagingModule,
 		  RepositoryModule,
-		  PillManageModule
+		  PillManageModule,
+		  UserManageModule
 		],
 })
 export class ApiModule {}
