@@ -3,13 +3,12 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy } from "passport-jwt";
 import { UserManageService } from "../user_manage.service";
-import { JwtDto } from "./jwt.strategy.dto";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy){
     constructor(private usermanage:UserManageService){
         super({
-            secretOrKey:'asdf',
+            secretOrKey:process.env.JWT,
             jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken()
         });
     }

@@ -9,12 +9,4 @@ export class EatRequestDto {
   @IsNotEmpty()
   @IsNumber()
   readonly jobId: number;
-
-  @ApiProperty({
-    description: 'userId',
-    example:"1"
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  readonly userId: number;
 }
