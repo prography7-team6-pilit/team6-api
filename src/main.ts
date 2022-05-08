@@ -42,6 +42,7 @@ async function bootstrap() {
 
 	await app.listen(port, () => {
 		console.log(`SERVER LISTENING ON port ${port}`);
+		console.log('v20200508');
 	});
 }
 bootstrap();
