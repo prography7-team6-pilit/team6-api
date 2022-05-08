@@ -1,5 +1,6 @@
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FirebaseCloudMessagingModule } from './firebase_cloud_messaging';
 import { MessageQueueModule } from './message_queue';
@@ -14,19 +15,20 @@ import { UserManageModule } from './user_manage';
 
 @Module({
 	imports: [
+		ConfigModule.forRoot(),
 		BullModule.forRoot({
 			redis: {
-				host: '127.0.0.1',
+				host: process.env.REDIS_USER,
 				port: 6379,
 			  },
 		  }),
 		  TypeOrmModule.forRoot({
 			type: 'mysql',
-			host: '127.0.0.1',
+			host: process.env.DATABASE_HOST,
 			port: 3306,
-			username: 'root',
-			password: 'root',
-			database: 'pillit',
+			username: process.env.DATABASE_USER,
+			password: process.env.DATABASE_PASSWORD,
+			database: process.env.DATABASE_NAME,
 			entities: [Job,User,Pill,Eat],
 			synchronize: true,
 		  }),

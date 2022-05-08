@@ -3,7 +3,7 @@ import { IsBoolean, IsNotEmpty } from "class-validator";
 
 export class EatResponseDto {
   @ApiProperty({
-    description: '성공 여부',
+    description: '체크되면 True, 체크해제되면 False',
     example:"true"
   })
   @IsNotEmpty()

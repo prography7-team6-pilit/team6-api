@@ -26,8 +26,6 @@ export class PillManageController {
 	}
 
 
-
-
     //Eat 기반으로 탐색
     @ApiBearerAuth('access-token')
     @ApiOperation({summary:'월별 섭취 정보'})
@@ -42,12 +40,12 @@ export class PillManageController {
     //대폭 수정필요. userId 없어도 가능.
     @ApiBearerAuth('access-token')
     @ApiOperation({summary:'약 복용 여부'})
-    @ApiCreatedResponse({description:"성공",type:EatResponseDto})
+    @ApiCreatedResponse({description:"체크되면 True, 체크해제되면 False",type:EatResponseDto})
     @UseGuards(JwtAuthGuard)
     @Post('/')
-    async takenPill(@Body(new ValidationPipe()) addPillDto:EatRequestDto,@Res() res:Response){
+    async takenPill(@Body(new ValidationPipe()) addEatDto:EatRequestDto,@Res() res:Response){
         const userId=1;
-        const result = await this.pillService.takePill(addPillDto);
+        const result = await this.pillService.takePill(userId,addEatDto);
         return res.json(result);
     }
 }

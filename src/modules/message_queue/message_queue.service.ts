@@ -43,7 +43,10 @@ export class MessageQueueService implements OnModuleDestroy{
 
     async addMsg(jobDto:JobRequestPostDto):Promise<string>{ //작업 생성
         const job=await this.msgq.add('transcode',{
-            jobDto
+            jobDto            
+        },
+        {
+            repeat: { cron: "*/1 * * * *" }
         });
         return job.id.toString();
         //reapeat : cron
