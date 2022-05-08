@@ -28,10 +28,10 @@ export class PillManageService {
         }
 	}
 
-    async takePill(eatDto:EatRequestDto){
+    async takePill(userId:number,eatDto:EatRequestDto){
         const data:Eat={
             eatId:0,
-            userId:eatDto.userId,
+            userId:userId,
             jobId:eatDto.jobId,
             eatDate:new Date(),
         }
