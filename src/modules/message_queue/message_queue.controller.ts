@@ -13,7 +13,7 @@ import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
 
 @Controller({
 	version: '1',
-	path: 'msgq',
+	path: 'job',
 })
 @ApiTags('알람 등록 API')
 export class MessageQueueController {
