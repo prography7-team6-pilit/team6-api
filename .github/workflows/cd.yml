@@ -46,4 +46,4 @@ jobs:
     # Update ECS services
     - name: Update ECS services
       run: |
-        aws ecs update-service --force-new-deployment --service team6-api --cluster team6-api
+        aws ecs update-service --force-new-deployment --service team6-api --cluster team6
