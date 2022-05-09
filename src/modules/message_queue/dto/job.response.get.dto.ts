@@ -7,11 +7,11 @@ export class JobResponseGetDto {
     description: '오늘의 알림 목록',
     example:`[
         {
-          "jobId": 7,
-          "jobTitle": "띵동!",
-          "jobDesc": "고혈압 약 먹을 시간입니다.",
-          "jobTime": "11:24",
-          "jobWeek": [
+          "alertId": 7,
+          "alertTitle": "띵동!",
+          "alertDesc": "고혈압 약 먹을 시간입니다.",
+          "alertTime": "11:24",
+          "alertWeek": [
             "Fri"
           ],
           "isPush": true,
@@ -21,11 +21,11 @@ export class JobResponseGetDto {
           "eatResult": true
         },
         {
-          "jobId": 8,
-          "jobTitle": "띵동!",
-          "jobDesc": "고혈압 약 먹을 시간입니다.",
-          "jobTime": "10:24",
-          "jobWeek": [
+          "alertId": 8,
+          "alertTitle": "띵동!",
+          "alertDesc": "고혈압 약 먹을 시간입니다.",
+          "alertTime": "10:24",
+          "alertWeek": [
             "Fri"
           ],
           "isPush": true,
@@ -37,5 +37,5 @@ export class JobResponseGetDto {
       ]`
   })
   @IsNotEmpty()
-  readonly job: JobResponseUnitGetDto[];
+  readonly alerts: JobResponseUnitGetDto[];
 }

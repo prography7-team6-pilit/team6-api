@@ -16,6 +16,6 @@ export class JobResponseDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  readonly jobId: number;
+  readonly alertId: number;
 
 }

@@ -15,7 +15,7 @@ export class MessageQueueService implements OnModuleDestroy{
     async getMsg(userId:number):Promise<JobResponseGetDto|undefined>{ //작업목록 불러오기
         const job=await this.repo.repo_getJob(userId);
         const result:JobResponseGetDto={
-            job: []
+            alerts: []
         };
         job?.forEach((data)=>{
             let arr=[];
@@ -28,16 +28,16 @@ export class MessageQueueService implements OnModuleDestroy{
             if(data.Sun==true){arr.push("Sun");}
 
             const tmp:JobResponseUnitGetDto={
-                jobId:data.jobId,
-                jobTitle: data.jobTitle,
-                jobDesc: data.jobDesc,
-                jobTime: data.jobTime,
-                jobWeek: arr,
+                alertId:data.alertId,
+                alertTitle: data.alertTitle,
+                alertDesc: data.alertDesc,
+                alertTime: data.alertTime,
+                alertWeek: arr,
                 isPush: data.isPush,
                 pillId: data.pillId,
                 pillName:""
             }
-            result.job.push(tmp);
+            result.alerts.push(tmp);
         });
         return result;
     }

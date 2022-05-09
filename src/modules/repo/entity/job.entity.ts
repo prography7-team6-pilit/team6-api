@@ -6,23 +6,23 @@ import { User } from './user.entity';
 @Entity('Job')
 export class Job {
   @PrimaryGeneratedColumn()
-  jobId: number;
+  alertId: number;
 
   @Column({
     type: 'text',
-    name: 'jobTitle',
+    name: 'alertTitle',
   })
-  jobTitle: string;
+  alertTitle: string;
   @Column({
     type: 'text',
-    name: 'jobDesc',
+    name: 'alertDesc',
   })
-  jobDesc: string;
+  alertDesc: string;
   @Column({
     type: 'text',
-    name: 'jobTime',
+    name: 'alertTime',
   })
-  jobTime: string;
+  alertTime: string;
   @Column({
     type: 'text',
     name: 'isPush',
@@ -74,6 +74,6 @@ export class Job {
   @JoinColumn({name:"userId"})
   userId:number;
 
-  @OneToMany(()=>Eat,(eat)=>eat.jobId,{ nullable: true })
+  @OneToMany(()=>Eat,(eat)=>eat.alertId,{ nullable: true })
   eat:Eat[];
 }
