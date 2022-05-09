@@ -47,7 +47,7 @@ export class RepositoryService {
   }
 
   async repo_getJob(id:number): Promise<Job[]|undefined> {
-    const job=await this.jobRepository.find({ userId :id });
+    const job=await this.jobRepository.find({ userId :id});
     return job;
   }
 

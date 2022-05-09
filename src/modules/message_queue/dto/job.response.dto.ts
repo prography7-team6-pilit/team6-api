@@ -4,7 +4,7 @@ import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validat
 export class JobResponseDto {
   @ApiProperty({
     description: '등록 여부',
-    example:"true"
+    example:true
   })
   @IsNotEmpty()
   @IsBoolean()
