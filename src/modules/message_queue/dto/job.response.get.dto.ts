@@ -4,7 +4,7 @@ import { JobResponseUnitGetDto } from "./job.response.get.unit.dto";
 
 export class JobResponseGetDto {
   @ApiProperty({
-    description: '등록된 Job 목록',
+    description: '오늘의 알림 목록',
     example:`[
         {
           "jobId": 7,
@@ -14,7 +14,11 @@ export class JobResponseGetDto {
           "jobWeek": [
             "Fri"
           ],
-          "isPush": "1"
+          "isPush": true,
+          "pillId": "1",
+          "pillName": "마그네슘",
+          "eatId": "3",
+          "eatResult": true
         },
         {
           "jobId": 8,
@@ -24,11 +28,14 @@ export class JobResponseGetDto {
           "jobWeek": [
             "Fri"
           ],
-          "isPush": "1"
+          "isPush": true,
+          "pillId": 1,
+          "pillName": "마그네슘",
+          "eatId": "0",
+          "eatResult": false
         }
       ]`
   })
   @IsNotEmpty()
-  @IsBoolean()
   readonly job: JobResponseUnitGetDto[];
 }
