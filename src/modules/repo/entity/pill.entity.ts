@@ -19,5 +19,5 @@ export class Pill {
   pillDesc: string;
 
   @OneToMany(()=>Job,(job)=>job.pillId,{ nullable: true })
-  job:Job[]
+  alert:Job[]
 }

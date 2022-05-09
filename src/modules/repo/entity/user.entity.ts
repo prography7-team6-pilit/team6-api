@@ -20,7 +20,7 @@ export class User {
   nickname: string;
 
   @OneToMany(()=>Job,(job)=>job.pillId,{ nullable: true })
-  job:Job[]
+  alert:Job[]
 
   @OneToMany(()=>Eat,(eat)=>eat.eatId,{ nullable: true })
   eat:Eat[]

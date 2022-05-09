@@ -11,7 +11,7 @@ import { EatResponseMonthDto } from './dto/eat.response.month.dto';
 
 @Controller({
 	version: '1',
-	path: 'pill',
+	path: 'pills',
 })
 @ApiTags('약 관련 API')
 export class PillManageController {
@@ -20,7 +20,7 @@ export class PillManageController {
     @ApiCreatedResponse({description:"성공",type:PillResponseDto})
     @ApiForbiddenResponse({description:"실패",type:PillResponseErrorDto})
     @ApiQuery({name:'name',required:true,description:'약 이름',example:'마그네슘'})
-	@Get()
+	@Get('/data')
 	async getPill(@Query('name') name:string, @Res() res:Response) {
         const result = await this.pillService.getPill(name);
 		return res.json(result);
@@ -32,18 +32,17 @@ export class PillManageController {
     @ApiOperation({summary:'월별 섭취 정보(캘린더)',description:"state는 총 두가지로 표현되며 [ 미완료(0), 완료(1) ] 데이터가 없는 날은 날짜가 나오지 않습니다."})
     @ApiCreatedResponse({description:"성공",type:EatResponseMonthDto})//type 수정하기
     @UseGuards(JwtAuthGuard)
-    @Get('month/')
+    @Get('/monthly')
     async monthPill(@Query('month') month:number,@Res() res:Response){
         return res.json();
     }
-
 
     //대폭 수정필요. userId 없어도 가능.
     @ApiBearerAuth('access-token')
     @ApiOperation({summary:'약 복용 여부'})
     @ApiCreatedResponse({description:"복용이 안되어있는데 True, 체크해제되면 False",type:EatResponseDto})
     @UseGuards(JwtAuthGuard)
-    @Post('/')
+    @Post('/taking-logs')
     async takenPill(@Body(new ValidationPipe()) addEatDto:EatRequestDto,@Res() res:Response){
         const userId=1;
         const result = await this.pillService.takePill(userId,addEatDto);
