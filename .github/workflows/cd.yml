@@ -27,7 +27,17 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-
+    - name: Create .env file
+        run: |
+          touch .env
+          echo DATABASE_HOST=${{ secrets.DATABASE_HOST }} >> .env
+          echo DATABASE_NAME=${{ secrets.DATABASE_NAME }} >> .env
+          echo DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} >> .env
+          echo DATABASE_USER=${{ secrets.DATABASE_USER }} >> .env
+          echo REDIS_USER=${{ secrets.REDIS_USER }} >> .env
+          echo JWT=${{ secrets.JWT }} >> .env
+          cat .env
+          
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
@@ -35,15 +45,9 @@ jobs:
         ECR_REPOSITORY: 7team6-api
         IMAGE_TAG: prod
         GITHUB_SHA: ${{ github.sha }}
-        DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-        DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-        DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-        DATABASE_USER: ${{ secrets.DATABASE_USER }}
-        REDIS_USER: ${{ secrets.REDIS_USER }}
-        JWT: ${{ secrets.JWT }}
       # TODO: 가장 최근에 달린 태그 달아서 배포하기
       run: |
-        docker build --env $DATABASE_HOST --env DATABASE_NAME --env DATABASE_PASSWORD --env DATABASE_USER --env REDIS_USER --env JWT -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
