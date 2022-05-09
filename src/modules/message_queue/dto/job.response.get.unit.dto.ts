@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsMilitaryTime, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { Week } from "./enums/week.enum";
 
 export class JobResponseUnitGetDto {
@@ -57,4 +57,11 @@ export class JobResponseUnitGetDto {
   })
   @IsNumber()
   readonly pillId:number;
+
+  @ApiProperty({
+    description: 'Notificatino 약 이름',
+    example:"마그네슘"
+  })
+  @IsNumber()
+  readonly pillName:string;
 }

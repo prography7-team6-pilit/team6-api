@@ -35,6 +35,7 @@ export class MessageQueueService implements OnModuleDestroy{
                 jobWeek: arr,
                 isPush: data.isPush,
                 pillId: data.pillId,
+                pillName:""
             }
             result.job.push(tmp);
         });

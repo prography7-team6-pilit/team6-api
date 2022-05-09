@@ -9,6 +9,7 @@ import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { MessageQueueService } from './message_queue.service';
 import { RepositoryService } from '@modules/repo/repo.service';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
+import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 
 
 @Controller({
@@ -21,7 +22,7 @@ export class MessageQueueController {
         private repo:RepositoryService){}
     
     @ApiBearerAuth('access-token')
-    @ApiOperation({summary:'알람 조회'})
+    @ApiOperation({summary:'오늘의 알람 조회 (메인페이지,캘린더)'})
     @ApiCreatedResponse({description:"성공",type:JobResponseGetDto})
     @UseGuards(JwtAuthGuard)
 	@Get('/get/')
@@ -32,7 +33,19 @@ export class MessageQueueController {
 	}
 
     @ApiBearerAuth('access-token')
-    @ApiOperation({summary:'알람 등록'})
+    @ApiOperation({summary:'특정 알람 조회 (수정페이지)'})
+    @ApiCreatedResponse({description:"성공",type:JobResponseUnitGetDto})
+    @ApiParam({name:'jobId',required:true,example:'1'})
+    @UseGuards(JwtAuthGuard)
+	@Get('/get/:jobId')
+	async getMsgUnit(@Param() id:Request,@Res() res:Response) {
+        const userId=1;
+        const result=await this.msgq.getMsg(userId);
+        return res.json(result);
+	}
+
+    @ApiBearerAuth('access-token')
+    @ApiOperation({summary:'알람 등록 (알람추가페이지)'})
     @ApiCreatedResponse({description:"성공",type:JobResponseDto})
     @ApiForbiddenResponse({description:"실패",type:JobResponseErrorDto})
     @UseGuards(JwtAuthGuard)
@@ -49,7 +62,7 @@ export class MessageQueueController {
     }
 
     @ApiBearerAuth('access-token')
-    @ApiOperation({summary:'알람 수정'})
+    @ApiOperation({summary:'알람 수정 (수정페이지)'})
     @ApiCreatedResponse({description:"성공",type:JobResponseDto})
     @ApiForbiddenResponse({description:"실패",type:JobResponseErrorDto})
     @UseGuards(JwtAuthGuard)
