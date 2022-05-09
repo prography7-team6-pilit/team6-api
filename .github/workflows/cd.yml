@@ -43,7 +43,7 @@ jobs:
         JWT: ${{ secrets.JWT }}
       # TODO: 가장 최근에 달린 태그 달아서 배포하기
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build --env $DATABASE_HOST --env DATABASE_NAME --env DATABASE_PASSWORD --env DATABASE_USER --env REDIS_USER --env JWT -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
