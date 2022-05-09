@@ -32,7 +32,7 @@ export class PillManageService {
         const data:Eat={
             eatId:0,
             userId:userId,
-            jobId:eatDto.jobId,
+            alertId:eatDto.alertId,
             eatDate:new Date(),
         }
         const result = await this.repo.repo_addPill(data);

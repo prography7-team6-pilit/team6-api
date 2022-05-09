@@ -20,10 +20,10 @@ export class RepositoryService {
   async repo_saveJob(bullId:string,userId:number,jobDto: JobRequestPostDto): Promise<Job> {
     //실패시 오류 처리해놓기.
     const job:Job={
-      jobId: 0,
-      jobTime: jobDto.jobTime,
-      jobDesc: jobDto.jobDesc,
-      jobTitle: jobDto.jobTitle,
+      alertId: 0,
+      alertTime: jobDto.alertTime,
+      alertDesc: jobDto.alertDesc,
+      alertTitle: jobDto.alertTitle,
       isPush: jobDto.isPush,
       pillId: jobDto.pillId,
       userId: userId,
@@ -31,7 +31,7 @@ export class RepositoryService {
       Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
 
     };
-    jobDto.jobWeek.forEach(element => {
+    jobDto.alertWeek.forEach(element => {
       switch (element){
         case "Mon":job.Mon=true;break;
         case "Tue":job.Tue=true;break;
@@ -52,7 +52,7 @@ export class RepositoryService {
   }
 
   async repo_getDel(id:number):Promise<DeleteResult>{
-    const job=await this.jobRepository.delete({jobId:id});
+    const job=await this.jobRepository.delete({alertId:id});
     return job;
   }
   //--------------------------------------------------------------
@@ -66,8 +66,8 @@ export class RepositoryService {
       userId:0,
       uuid:userDto.uuid,
       nickname:userDto.nickname,
-      job:[],
-      eat:[]
+      alert:[],
+      eat:[],
     };
     const result=await this.userRepository.save(userEntity);
     return result;

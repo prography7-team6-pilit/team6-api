@@ -8,7 +8,7 @@ import { UserManageService } from './user_manage.service';
 
 @Controller({
 	version: '1',
-	path: 'user',
+	path: 'users',
 })
 @ApiTags('사용자 관련 API')
 export class UserManageController {
@@ -18,7 +18,7 @@ export class UserManageController {
 	@ApiCreatedResponse({status:201,description:"인증 성공",type:UserResponseDto})
 	@ApiForbiddenResponse({status:401,description:"인증 실패",type:UserResponseErrorDto})
 	@ApiQuery({name:'uuid',required:true,description:'uuid',example:'123e4567-e89b-12d3-a456-426614174000'})
-	@Get()
+	@Get('/login')
 	async getUser(@Query('uuid') uuid:string,@Res() res:Response) {
 		const accessToken=await this.userService.signIn(uuid);
 		if(accessToken){
@@ -41,7 +41,7 @@ export class UserManageController {
 	@ApiOperation({summary:'닉네임 등록 (AccessToken 헤더로 반환)'})
 	@ApiCreatedResponse({description:"닉네임 등록 성공",type:UserResponseDto})
 	@ApiForbiddenResponse({description:"존재하는 uuid",type:UserResponseErrorDto})
-    @Post()
+    @Post('/join')
 	async setUser(@Body() userDto:UserRequestDto,@Res() res:Response) {
 		const accessToken=await this.userService.signUp(userDto);
 		if(accessToken){

@@ -10,9 +10,9 @@ export class Eat {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP',name:'eatDate'})
   eatDate:Date
 
-  @ManyToOne(()=>Job,(job)=>job.jobId)
-  @JoinColumn({name:"jobId"})
-  jobId:number;
+  @ManyToOne(()=>Job,(job)=>job.alertId)
+  @JoinColumn({name:"alertId"})
+  alertId:number;
 
   @ManyToOne(()=>User,(user)=>user.userId)
   @JoinColumn({name:"userId"})

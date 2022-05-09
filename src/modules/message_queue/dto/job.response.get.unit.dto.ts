@@ -9,7 +9,7 @@ export class JobResponseUnitGetDto {
   })
   @IsNotEmpty()
   @IsString()
-  readonly jobId: number;
+  readonly alertId: number;
 
   @ApiProperty({
     description: 'Notification 제목',
@@ -17,7 +17,7 @@ export class JobResponseUnitGetDto {
   })
   @IsNotEmpty()
   @IsString()
-  readonly jobTitle: string;
+  readonly alertTitle: string;
 
   @ApiProperty({
     description: 'Notification 내용',
@@ -25,7 +25,7 @@ export class JobResponseUnitGetDto {
   })
   @IsNotEmpty()
   @IsString()
-  readonly jobDesc: string;
+  readonly alertDesc: string;
 
   @ApiProperty({
     description: 'Notification 시간',
@@ -33,7 +33,7 @@ export class JobResponseUnitGetDto {
   })
   @IsNotEmpty()
   @IsString()
-  readonly jobTime: string;
+  readonly alertTime: string;
 
   @ApiProperty({
     description: 'Notification 요일',
@@ -42,7 +42,7 @@ export class JobResponseUnitGetDto {
     example:['Mon','Fri']
   })
   @IsEnum(Week,{each:true})
-  readonly jobWeek:string[]
+  readonly alertWeek:string[]
 
   @ApiProperty({
     description: 'Notification 여부',
