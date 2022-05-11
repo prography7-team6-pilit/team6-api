@@ -36,18 +36,6 @@ export class MessageQueueController {
 	}
 
     @ApiBearerAuth('access-token')
-    @ApiOperation({summary:'특정 알람 조회 (수정페이지)'})
-    @ApiCreatedResponse({description:"성공",type:JobResponseUnitGetDto})
-    @ApiParam({name:'alertsId',required:true,example:'1'})
-    @UseGuards(JwtAuthGuard)
-	@Get('/:alertId')
-	async getMsgUnit(@Param('alertId') id:Request,@Res() res:Response) {
-        const userId=1;
-        const result=await this.msgq.getMsg(userId);
-        return res.json(result);
-	}
-
-    @ApiBearerAuth('access-token')
     @ApiOperation({summary:'알람 등록 (알람추가페이지)'})
     @ApiCreatedResponse({description:"성공",type:JobResponseDto})
     @ApiForbiddenResponse({description:"실패",type:JobResponseErrorDto})
