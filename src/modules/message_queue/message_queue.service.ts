@@ -29,12 +29,9 @@ export class MessageQueueService implements OnModuleDestroy{
 
             const tmp:JobResponseUnitGetDto={
                 alertId:data.alertId,
-                alertTitle: data.alertTitle,
-                alertDesc: data.alertDesc,
                 alertTime: data.alertTime,
                 alertWeek: arr,
                 isPush: data.isPush,
-                pillId: data.pillId,
                 pillName:""
             }
             result.alerts.push(tmp);

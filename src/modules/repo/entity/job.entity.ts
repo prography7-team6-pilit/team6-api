@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Eat } from './eat.entity';
-import { Pill } from './pill.entity';
 import { User } from './user.entity';
 
 @Entity('Job')
@@ -8,16 +7,6 @@ export class Job {
   @PrimaryGeneratedColumn()
   alertId: number;
 
-  @Column({
-    type: 'text',
-    name: 'alertTitle',
-  })
-  alertTitle: string;
-  @Column({
-    type: 'text',
-    name: 'alertDesc',
-  })
-  alertDesc: string;
   @Column({
     type: 'text',
     name: 'alertTime',
@@ -66,10 +55,6 @@ export class Job {
   })
   Sun: boolean;
   
-  @ManyToOne(()=>Pill,(pill)=>pill.pillId)
-  @JoinColumn({name:"pillId"})
-  pillId:number;
-
   @ManyToOne(()=>User,(user)=>user.userId)
   @JoinColumn({name:"userId"})
   userId:number;
