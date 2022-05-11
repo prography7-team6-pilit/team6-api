@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { Eat } from './entity/eat.entity';
 import { Job } from './entity/job.entity';
-import { Pill } from './entity/pill.entity';
 import { User } from './entity/user.entity';
 
 @Injectable()
@@ -13,7 +12,6 @@ export class RepositoryService {
   constructor(
     @InjectRepository(Job) private jobRepository:Repository<Job>,
     @InjectRepository(User) private userRepository:Repository<User>,
-    @InjectRepository(Pill) private pillRepository:Repository<Pill>,
     @InjectRepository(Eat) private eatRepository:Repository<Eat>,
   ){}
 
@@ -22,10 +20,7 @@ export class RepositoryService {
     const job:Job={
       alertId: 0,
       alertTime: jobDto.alertTime,
-      alertDesc: jobDto.alertDesc,
-      alertTitle: jobDto.alertTitle,
       isPush: jobDto.isPush,
-      pillId: jobDto.pillId,
       userId: userId,
       bullId: bullId,
       Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
@@ -74,10 +69,6 @@ export class RepositoryService {
   }
   //--------------------------------------------------------------
 
-  async repo_getPill(name:string){
-    const result= await this.pillRepository.findOne({pillName:name});
-    return result;
-  }
   async repo_addPill(eat:Eat){
     const result= await this.eatRepository.save(eat);
     return result;
