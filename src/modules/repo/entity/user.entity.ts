@@ -19,7 +19,13 @@ export class User {
   })
   nickname: string;
 
-  @OneToMany(()=>Job,(job)=>job.pillId,{ nullable: true })
+  @Column({
+    type: 'text',
+    name: 'firebasetoken',
+  })
+  firebasetoken: string;
+
+  @OneToMany(()=>Job,(job)=>job.alertId,{ nullable: true })
   alert:Job[]
 
   @OneToMany(()=>Eat,(eat)=>eat.eatId,{ nullable: true })

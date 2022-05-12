@@ -1,9 +1,7 @@
 import { Body, Controller, Get, Post, Query, Res, UseGuards, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { PillResponseErrorDto } from './dto/pill.error.dto';
 import { EatRequestDto } from './dto/eat.request.post.dto';
-import { PillResponseDto } from './dto/pill.response.dto';
 import { PillManageService } from './pill_manage.service';
 import { EatResponseDto } from './dto/eat.response.post.dto';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
@@ -16,16 +14,6 @@ import { EatResponseMonthDto } from './dto/eat.response.month.dto';
 @ApiTags('약 관련 API')
 export class PillManageController {
     constructor(private readonly pillService:PillManageService){}
-    @ApiOperation({summary:'약 정보 조회(약추가할때)'})
-    @ApiCreatedResponse({description:"성공",type:PillResponseDto})
-    @ApiForbiddenResponse({description:"실패",type:PillResponseErrorDto})
-    @ApiQuery({name:'name',required:true,description:'약 이름',example:'마그네슘'})
-	@Get('/data')
-	async getPill(@Query('name') name:string, @Res() res:Response) {
-        const result = await this.pillService.getPill(name);
-		return res.json(result);
-	}
-
 
     //Eat 기반으로 탐색
     @ApiBearerAuth('access-token')
@@ -33,7 +21,7 @@ export class PillManageController {
     @ApiCreatedResponse({description:"성공",type:EatResponseMonthDto})//type 수정하기
     @UseGuards(JwtAuthGuard)
     @Get('/monthly')
-    async monthPill(@Query('month') month:number,@Res() res:Response){
+    async monthPill(@Query('year') year:number,@Query('month') month:number,@Res() res:Response){
         return res.json();
     }
 
