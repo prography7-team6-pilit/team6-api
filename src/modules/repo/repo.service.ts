@@ -15,28 +15,7 @@ export class RepositoryService {
     @InjectRepository(Eat) private eatRepository:Repository<Eat>,
   ){}
 
-  async repo_saveJob(bullId:string,userId:number,jobDto: JobRequestPostDto): Promise<Job> {
-    //실패시 오류 처리해놓기.
-    const job:Job={
-      alertId: 0,
-      alertTime: jobDto.alertTime,
-      isPush: jobDto.isPush,
-      userId: userId,
-      bullId: bullId,
-      Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
-
-    };
-    jobDto.alertWeek.forEach(element => {
-      switch (element){
-        case "Mon":job.Mon=true;break;
-        case "Tue":job.Tue=true;break;
-        case "Wed":job.Wed=true;break;
-        case "Thu":job.Thu=true;break;
-        case "Fri":job.Fri=true;break;
-        case "Sat":job.Sat=true;break;
-        case "Sun":job.Sun=true;break;
-      }        
-    });
+  async repo_saveJob(job:Job): Promise<Job> {
     const result=await this.jobRepository.save(job);
     return result;
   }
@@ -56,14 +35,8 @@ export class RepositoryService {
     const nickname=await this.userRepository.findOne({uuid:uuid});
     return nickname;
   }
-  async setNickname(userDto:UserRequestDto):Promise<User>{
-    const userEntity:User={
-      userId:0,
-      uuid:userDto.uuid,
-      nickname:userDto.nickname,
-      alert:[],
-      eat:[],
-    };
+
+  async setNickname(userEntity:User):Promise<User>{
     const result=await this.userRepository.save(userEntity);
     return result;
   }
