@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm';
 import { Job } from './job.entity';
-import { User } from './user.entity';
 
 @Entity('Eat')
 export class Eat {
@@ -10,11 +9,7 @@ export class Eat {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP',name:'eatDate'})
   eatDate:Date
 
-  @ManyToOne(()=>Job,(job)=>job.alertId)
+  @ManyToOne(()=>Job,(job)=>job.alertId,{ nullable: false, eager: true })
   @JoinColumn({name:"alertId"})
   alertId:number;
-
-  @ManyToOne(()=>User,(user)=>user.userId)
-  @JoinColumn({name:"userId"})
-  userId:number;
 }

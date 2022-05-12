@@ -27,7 +27,4 @@ export class User {
 
   @OneToMany(()=>Job,(job)=>job.alertId,{ nullable: true })
   alert:Job[]
-
-  @OneToMany(()=>Eat,(eat)=>eat.eatId,{ nullable: true })
-  eat:Eat[]
 }

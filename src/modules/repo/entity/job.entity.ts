@@ -13,7 +13,7 @@ export class Job {
   })
   alertTime: string;
   @Column({
-    type: 'text',
+    type: 'boolean',
     name: 'isPush',
   })
   isPush: boolean;
@@ -23,7 +23,12 @@ export class Job {
   })
   bullId: string;
 
-    Mon: boolean;
+  @Column({
+    type: 'boolean',
+    name: 'Mon',
+  })
+  Mon: boolean;
+
   @Column({
     type: 'boolean',
     name: 'Tue',
@@ -60,6 +65,12 @@ export class Job {
     name: 'firebasetoken',
   })
   firebasetoken: string;
+
+  @Column({
+    type: 'text',
+    name: 'pillName',
+  })
+  pillName: string;
   
   @ManyToOne(()=>User,(user)=>user.userId)
   @JoinColumn({name:"userId"})
