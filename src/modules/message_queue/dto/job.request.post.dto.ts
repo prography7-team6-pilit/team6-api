@@ -3,8 +3,6 @@ import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validat
 import { Week } from "./enums/week.enum";
 
 export class JobRequestPostDto {
-
-
   @ApiProperty({
     description: 'Notification 시간',
     example:"10:24"
@@ -33,6 +31,6 @@ export class JobRequestPostDto {
     description: 'Notificatino 약 이름',
     example:"마그네슘"
   })
-  @IsNumber()
+  @IsString()
   readonly pillName:string;
 }
