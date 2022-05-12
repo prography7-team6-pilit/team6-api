@@ -7,7 +7,6 @@ import { MessageQueueModule } from './message_queue';
 import { PillManageModule } from './pill_manage/pill_manage.module';
 import { Eat } from './repo/entity/eat.entity';
 import { Job } from './repo/entity/job.entity';
-import { Pill } from './repo/entity/pill.entity';
 import { User } from './repo/entity/user.entity';
 import { RepositoryModule } from './repo/repo.module';
 import { SampleModule } from './sample';
@@ -29,7 +28,7 @@ import { UserManageModule } from './user_manage';
 			username: process.env.DATABASE_USER,
 			password: process.env.DATABASE_PASSWORD,
 			database: process.env.DATABASE_NAME,
-			entities: [Job,User,Pill,Eat],
+			entities: [Job,User,Eat],
 			synchronize: true,
 		  }),
 		  SampleModule,

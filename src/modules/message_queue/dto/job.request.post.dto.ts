@@ -4,22 +4,6 @@ import { Week } from "./enums/week.enum";
 
 export class JobRequestPostDto {
   @ApiProperty({
-    description: 'Notification 제목',
-    example:"띵동!"
-  })
-  @IsNotEmpty()
-  @IsString()
-  readonly alertTitle: string;
-
-  @ApiProperty({
-    description: 'Notification 내용',
-    example:"고혈압 약 먹을 시간입니다."
-  })
-  @IsNotEmpty()
-  @IsString()
-  readonly alertDesc: string;
-
-  @ApiProperty({
     description: 'Notification 시간',
     example:"10:24"
   })
@@ -44,9 +28,9 @@ export class JobRequestPostDto {
   readonly isPush:boolean;
 
   @ApiProperty({
-    description: 'Notificatino 약 고유번호',
-    example:1
+    description: 'Notificatino 약 이름',
+    example:"마그네슘"
   })
-  @IsNumber()
-  readonly pillId:number;
+  @IsString()
+  readonly pillName:string;
 }
