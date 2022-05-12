@@ -1,3 +1,4 @@
+import { User } from '@modules/repo/entity/user.entity';
 import { RepositoryService } from '@modules/repo/repo.service';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -11,9 +12,14 @@ export class UserManageService {
 	async signIn(uuid:string):Promise<string | undefined>{
 		try{
 			const result=await this.repo.getNickname(uuid);
-			const payload={...result};
-			const accessToken = this.jwtService.sign(payload);
-			return accessToken;
+			if(result){
+				const payload={...result};
+				const accessToken = this.jwtService.sign(payload);
+				return accessToken;
+			}
+			else{
+				return undefined
+			}
 		}
 		catch{
 			return undefined
@@ -21,7 +27,15 @@ export class UserManageService {
 	}
 	async signUp(userDto:UserRequestDto):Promise<string | undefined>{
 		try{
-			const result = await this.repo.setNickname(userDto);
+			const userEntity:User={
+				userId:0,
+				uuid:userDto.uuid,
+				nickname:userDto.nickname,
+				firebasetoken:userDto.firebasetoken,
+				alert:[],
+				eat:[],
+			};
+			const result = await this.repo.setNickname(userEntity);
 			const payload={result};
 			const accessToken = await this.jwtService.sign(payload);
 			return accessToken;	

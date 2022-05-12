@@ -17,4 +17,12 @@ export class UserRequestDto {
   @IsNotEmpty()
   @IsString()
   readonly nickname: string;
+
+  @ApiProperty({
+    description: 'firebasetoken',
+    example:"bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1"
+  })
+  @IsNotEmpty()
+  @IsString()
+  readonly firebasetoken: string;
 }

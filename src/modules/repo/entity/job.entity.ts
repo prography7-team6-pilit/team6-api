@@ -54,6 +54,12 @@ export class Job {
     name: 'Sun',
   })
   Sun: boolean;
+
+  @Column({
+    type: 'text',
+    name: 'firebasetoken',
+  })
+  firebasetoken: string;
   
   @ManyToOne(()=>User,(user)=>user.userId)
   @JoinColumn({name:"userId"})

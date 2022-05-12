@@ -19,6 +19,12 @@ export class User {
   })
   nickname: string;
 
+  @Column({
+    type: 'text',
+    name: 'firebasetoken',
+  })
+  firebasetoken: string;
+
   @OneToMany(()=>Job,(job)=>job.alertId,{ nullable: true })
   alert:Job[]
 

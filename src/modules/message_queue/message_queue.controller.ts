@@ -9,7 +9,6 @@ import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { MessageQueueService } from './message_queue.service';
 import { RepositoryService } from '@modules/repo/repo.service';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
-import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 	
 
 @Controller({
@@ -43,8 +42,9 @@ export class MessageQueueController {
     @Post('/')
     async setMsg(@Req() req:Request, @Body(new ValidationPipe()) addJobDto:JobRequestPostDto, @Res() res:Response){
         const userId=1;
-        const bullId:string=await this.msgq.addMsg(addJobDto);
-        const saveJob=await this.repo.repo_saveJob(bullId,userId,addJobDto); //res.user 의 userId 가져오기
+        const firebasetoken="token";
+
+        const saveJob=await this.msgq.addMsg(userId,firebasetoken,addJobDto);
         const result:JobResponseDto={
             result:true,
             alertId:saveJob.alertId
@@ -60,6 +60,10 @@ export class MessageQueueController {
     @Put('/:alertId')
     async changeMsg(@Req() req:Request,@Res() res:Response,@Param('alertId') id:number,@Body(new ValidationPipe()) addJobDto:JobRequestPostDto){
         const userId=1;
+        console.log(req.user);
+        console.log(id)
+        console.log(addJobDto);
+        return res.json(req.user);
         /*
         const bullId:string=await this.msgq.addMsg(addJobDto);
         const saveJob=await this.repo.repo_saveJob(bullId,userId,addJobDto); //res.user 의 userId 가져오기
