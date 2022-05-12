@@ -17,5 +17,5 @@ export class EatResponseMonthDto {
       ]`
   })
   @IsNotEmpty()
-  readonly eat: EatResponseMonthUnitDto[];
+  readonly takelogs: EatResponseMonthUnitDto[];
 }
