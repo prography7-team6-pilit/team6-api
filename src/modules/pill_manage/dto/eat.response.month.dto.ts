@@ -8,11 +8,11 @@ export class EatResponseMonthDto {
     example:`[
         {
           "eatDate": "2022-05-09",
-          "state": 0
+          "pillState": 0
         },
         {
           "eatDate": "2022-05-10",
-          "state": 1
+          "pillState": 1
         }
       ]`
   })

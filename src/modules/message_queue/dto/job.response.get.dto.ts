@@ -14,7 +14,7 @@ export class JobResponseGetDto {
           ],
           "isPush": true,
           "pillName": "마그네슘",
-          "eatId": "3",
+          "eatId": 3,
           "eatResult": true
         },
         {
@@ -25,7 +25,7 @@ export class JobResponseGetDto {
           ],
           "isPush": true,
           "pillName": "마그네슘",
-          "eatId": "0",
+          "eatId": 0,
           "eatResult": false
         }
       ]`
