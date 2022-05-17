@@ -14,7 +14,7 @@ import { UserManageService } from './user_manage.service';
     JwtModule.register({
       secret:process.env.JWT,
       signOptions:{
-        expiresIn:6000*60,
+        expiresIn:60000000000*600000000000,
       }
     }),
     RepositoryModule
