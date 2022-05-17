@@ -1,10 +1,12 @@
+import { Eat } from '@modules/repo/entity/eat.entity';
 import { Job } from '@modules/repo/entity/job.entity';
 import { RepositoryService } from '@modules/repo/repo.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bull';
+import { Week } from './dto/enums/week.enum';
 import { JobRequestPostDto } from './dto/job.request.post.dto';
-import { JobResponseDeleteDto } from './dto/job.response.del.dto';
+import { JobResponseDto } from './dto/job.response.dto';
 import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 
@@ -13,8 +15,10 @@ import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 export class MessageQueueService implements OnModuleDestroy{
     constructor(@InjectQueue('message') private msgq:Queue,private repo:RepositoryService){}
 
-    async getMsg(userId:number):Promise<JobResponseGetDto|undefined>{ //작업목록 불러오기
-        const job=await this.repo.repo_getJob(userId);
+    async getMsg(year:number,month:number,day:number,userId:number):Promise<JobResponseGetDto|undefined>{ //작업목록 불러오기
+        const week:Date=await this.strTodate(year,month,day);
+        const strWeek=Week[week.getDay()];
+        const job=await this.repo.repo_getJob(strWeek,userId,week);
         const result:JobResponseGetDto={
             alerts: []
         };
@@ -33,7 +37,10 @@ export class MessageQueueService implements OnModuleDestroy{
                 alertTime: data.alertTime,
                 alertWeek: arr,
                 isPush: data.isPush,
-                pillName:""
+                pillName:data.pillName,
+                //수정하기
+                eatId:0,
+                eatResult:false,
             }
             result.alerts.push(tmp);
         });
@@ -57,6 +64,7 @@ export class MessageQueueService implements OnModuleDestroy{
             isPush: jobDto.isPush,
             userId: userId,
             bullId: bullId,
+            pillName:jobDto.pillName,
             Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
             firebasetoken:firebasetoken,
         };
@@ -73,28 +81,28 @@ export class MessageQueueService implements OnModuleDestroy{
         });
         const saveJob=await this.repo.repo_saveJob(jobEntity); //res.user 의 userId 가져오기
         return saveJob;
-
     }
-    async putMsg(){
-        
+    async putMsg(id:number):Promise<Eat[]|undefined>{
+        const data = await this.repo.repo_getPut(id);
+        return data;
     }
 
-    async delMsg(id:number):Promise<JobResponseDeleteDto>{
+    async delMsg(id:number):Promise<JobResponseDto>{
         try{
             const data=await this.repo.repo_getDel(id);
-            const result:JobResponseDeleteDto={
+            let apiData:JobResponseDto={
                 result:true
             }
             if(data.affected!>0){
-                result.result=true;
+                apiData.result=true;
             }
             else{
-                result.result=false;
+                apiData.result=false;
             }
-            return result;
+            return apiData;
         }
         catch{
-            const result:JobResponseDeleteDto={
+            const result:JobResponseDto={
                 result:true
             }
             return result;
@@ -103,5 +111,11 @@ export class MessageQueueService implements OnModuleDestroy{
     
     async onModuleDestroy() {
         await this.msgq.close();
+    }
+
+    async strTodate(year:number,month:number,day:number){
+        const strDate = year+'-'+month.toString().padStart(2,'0')+'-'+day.toString().padStart(2,'0');
+        const dateDate = new Date(strDate);
+        return dateDate;
     }
 }

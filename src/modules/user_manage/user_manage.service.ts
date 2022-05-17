@@ -33,7 +33,6 @@ export class UserManageService {
 				nickname:userDto.nickname,
 				firebasetoken:userDto.firebasetoken,
 				alert:[],
-				eat:[],
 			};
 			const result = await this.repo.setNickname(userEntity);
 			const payload={result};
