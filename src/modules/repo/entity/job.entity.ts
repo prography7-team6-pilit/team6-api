@@ -76,6 +76,7 @@ export class Job {
   @JoinColumn({name:"userId"})
   userId:number;
 
-  @OneToMany(()=>Eat,(eat)=>eat.alertId,{ nullable: true })
+  @OneToMany(()=>Eat,(eat)=>eat.alertId, { eager: true })
+  @JoinColumn({name:'eatId'})
   eat:Eat[];
 }
