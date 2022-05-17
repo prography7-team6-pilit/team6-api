@@ -41,4 +41,18 @@ export class JobResponseUnitGetDto {
   })
   @IsNumber()
   readonly pillName:string;
+
+  @ApiProperty({
+    description: '약을 먹었는가?',
+    example:"마그네슘"
+  })
+  @IsNumber()
+  readonly eatId:number;
+
+  @ApiProperty({
+    description: '약을 먹었는가?',
+    example:"마그네슘"
+  })
+  @IsNumber()
+  readonly eatResult:boolean;
 }
