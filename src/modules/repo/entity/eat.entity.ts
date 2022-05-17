@@ -9,7 +9,7 @@ export class Eat {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP',name:'eatDate'})
   eatDate:Date
 
-  @ManyToOne(()=>Job,(job)=>job.alertId,{ nullable: false, eager: true })
+  @ManyToOne(()=>Job,(job)=>job.alertId,{ nullable: false })
   @JoinColumn({name:"alertId"})
   alertId:number;
 }
