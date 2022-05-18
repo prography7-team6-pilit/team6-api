@@ -1,5 +1,4 @@
 import { Column, Entity, Generated, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Eat } from './eat.entity';
 import { Job } from './job.entity';
 
 @Entity('User')
