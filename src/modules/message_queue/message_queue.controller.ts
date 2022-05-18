@@ -77,7 +77,7 @@ export class MessageQueueController {
         const userId=1;
         const firebasetoken="token";
 
-        const saveJob=await this.msgq.addMsg(userId,firebasetoken,addJobDto);
+        //const saveJob=await this.msgq.addMsg(userId,firebasetoken,addJobDto);
         const result:JobResponseDto={
             result:true
         }
