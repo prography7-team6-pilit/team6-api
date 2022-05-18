@@ -4,6 +4,7 @@ import { RepositoryService } from '@modules/repo/repo.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bull';
+import e from 'express';
 import { Week } from './dto/enums/week.enum';
 import { JobRequestPostDto } from './dto/job.request.post.dto';
 import { JobResponseDto } from './dto/job.response.dto';
@@ -22,26 +23,28 @@ export class MessageQueueService implements OnModuleDestroy{
         const result:JobResponseGetDto={
             alerts: []
         };
-        job?.forEach((data)=>{
+        job.forEach((data)=>{
             let arr=[];
-            if(data.Mon==true){arr.push("Mon");}
-            if(data.Tue==true){arr.push("Tue");}
-            if(data.Wed==true){arr.push("Wed");}
-            if(data.Thu==true){arr.push("Thu");}
-            if(data.Fri==true){arr.push("Fri");}
-            if(data.Sat==true){arr.push("Sat");}
-            if(data.Sun==true){arr.push("Sun");}
+            if(data.job_Mon==true){arr.push("Mon");}
+            if(data.job_Tue==true){arr.push("Tue");}
+            if(data.job_Wed==true){arr.push("Wed");}
+            if(data.job_Thu==true){arr.push("Thu");}
+            if(data.job_Fri==true){arr.push("Fri");}
+            if(data.job_Sat==true){arr.push("Sat");}
+            if(data.job_Sun==true){arr.push("Sun");}
+
+            if(data.eat_eatId){data.eat_eatResult=true}else{data.eat_eatResult=false}
 
             const tmp:JobResponseUnitGetDto={
-                alertId:data.alertId,
-                alertTime: data.alertTime,
-                alertWeek: arr,
-                isPush: data.isPush,
-                pillName:data.pillName,
-                //수정하기
-                eatId:0,
-                eatResult:false,
+                alertId:data.job_alertId,
+                alertTime:data.job_alertTime,
+                alertWeek:arr,
+                isPush:data.job_isPush,
+                pillName:data.job_pillName,
+                eatId:data.eat_eatId,
+                eatResult:data.eat_eatResult
             }
+            console.log(data);
             result.alerts.push(tmp);
         });
         return result;
@@ -67,6 +70,7 @@ export class MessageQueueService implements OnModuleDestroy{
             pillName:jobDto.pillName,
             Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
             firebasetoken:firebasetoken,
+            IsRemoved:false
         };
         jobDto.alertWeek.forEach(element => {
             switch (element){

@@ -71,6 +71,12 @@ export class Job {
     name: 'pillName',
   })
   pillName: string;
+
+  @Column({
+    type: 'boolean',
+    name: 'IsRemoved',
+  })
+  IsRemoved: boolean;
   
   @ManyToOne(()=>User,(user)=>user.userId)
   @JoinColumn({name:"userId"})
