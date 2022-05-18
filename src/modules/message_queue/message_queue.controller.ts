@@ -20,19 +20,19 @@ export class MessageQueueController {
     constructor(private msgq:MessageQueueService){}
     
     @ApiBearerAuth('access-token')
-    @ApiOperation({summary:'오늘의 알람 조회 (메인페이지,캘린더)'})
+    @ApiOperation({summary:'오늘의 알람 조회 (메인페이지,캘린더) - req.user만 구현하면 완료'})
     @ApiCreatedResponse({description:"성공",type:JobResponseGetDto})
     @ApiQuery({name:'year',required:true,description:'년도',example:2022})
     @ApiQuery({name:'month',required:true,description:'월',example:5})
     @ApiQuery({name:'day',required:true,description:'일',example:9})
     @UseGuards(JwtAuthGuard)
 	@Get('/')
-	async getMsg(@Query('year') year:number,@Query('month') month:number,@Query('day') day:number,@Res() res:Response) {
+	async getMsg(@Query('year') year:number,@Query('month') month:number,@Query('day') day:number,@Req() req:Request,@Res() res:Response) {
         const userId=1;
-        const result=await this.msgq.getMsg(year,month,day,userId);
+        //const result=await this.msgq.getMsg(year,month,day,userId);
+        //console.log(result);
         //return res.json(result);
-        
-
+    
         //API Dummuy
         const apidummy1:JobResponseUnitGetDto={
             alertId:3,
