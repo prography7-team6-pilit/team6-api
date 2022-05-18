@@ -1,4 +1,6 @@
 import { JobRequestPostDto } from '@modules/message_queue/dto/job.request.post.dto';
+import { JobResponseGetDto } from '@modules/message_queue/dto/job.response.get.dto';
+import { JobResponseUnitGetDto } from '@modules/message_queue/dto/job.response.get.unit.dto';
 import { UserRequestDto } from '@modules/user_manage/dto/user.request.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,7 +15,6 @@ export class RepositoryService {
     @InjectRepository(Job) private jobRepository:Repository<Job>,
     @InjectRepository(User) private userRepository:Repository<User>,
     @InjectRepository(Eat) private eatRepository:Repository<Eat>,
-    
   ){}
 
   async repo_saveJob(job:Job): Promise<Job> {
@@ -21,38 +22,28 @@ export class RepositoryService {
     return result;
   }
 
-  async repo_getJob(week:string,id:number,date:Date): Promise<Job[]|undefined> {
-
-    let query;
-    if(week=="Mon"){query={where:{userId:id,Mon:true}};}
-    if(week=="Tue"){query={where:{userId:id,Tue:true}};}
-    if(week=="Wed"){query={where:{userId:id,Wed:true}};}
-    if(week=="Thu"){query={where:{userId:id,Thu:true}};}
-    if(week=="Fri"){query={where:{userId:id,Fri:true}};}
-    if(week=="Sat"){query={where:{userId:id,Sat:true}};}
-    if(week=="Sun"){query={where:{userId:id,Sun:true}};}
-    //-----------------------------------
-    const job=await this.jobRepository.find(query);
+  async repo_getJob(week:string,id:number,date:Date) {
     const db=await getConnection();
 
-    const from_date = date;
+    const from_date = new Date(date);
     const to_date = new Date(date.setDate(date.getDate() + 1));
 
     const jobLists= await db.getRepository(Job)
     .createQueryBuilder("job")
     .leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
-    .where('eat.eatDate >= :from_date', {
+    .where("job.userId= :userId",{userId:id})
+    .andWhere("IsRemoved=false")
+    .andWhere('eat.eatDate >= :from_date', {
       from_date: from_date,
     })
     .andWhere('eat.eatDate >= :to_date', {
       to_date: to_date,
     })
-    .getMany();
-    console.log(jobLists);
-    db.close();
+    .orWhere('eatId is null')
+    .getRawMany();
+    await db.close();
 
-    return job;
-
+    return jobLists;
   }
 
   async repo_getPut(id:number): Promise<Eat[]|undefined> {
@@ -85,14 +76,14 @@ export class RepositoryService {
     const jobLists= await db.getRepository(Job)
     .createQueryBuilder("job")
     .leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
-    .where('eat.eatDate >= :from_date', {
+    .where("eatId=")
+    .andWhere('eat.eatDate >= :from_date', {
       from_date: from_date,
     })
     .andWhere('eat.eatDate >= :to_date', {
       to_date: to_date,
     })
     .getMany();
-
     db.close();
 
   }

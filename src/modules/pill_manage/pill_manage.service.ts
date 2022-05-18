@@ -17,7 +17,7 @@ export class PillManageService {
     async takePill(eatDto:EatRequestDto){
         const data:Eat={
             eatId:0,
-            alertId:eatDto.eatId,
+            alertId:eatDto.alertId,
             eatDate:new Date(),
         }
         const result = await this.repo.repo_addPill(data);
