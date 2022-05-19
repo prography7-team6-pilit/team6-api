@@ -24,7 +24,7 @@ export class PillManageController {
     @Get('/monthly')
     async monthPill(@Query('year') year:number,@Query('month') month:number,@Res() res:Response){
         const userId=1;
-        const result=await this.pillService.getMonthPill(userId,year,month);
+        //const result=await this.pillService.getMonthPill(userId,year,month);
 
         const apiDummy1:EatResponseMonthUnitDto={eatDate:"2022-05-01",pillState:0}
         const apiDummy2:EatResponseMonthUnitDto={eatDate:"2022-05-03",pillState:1,}

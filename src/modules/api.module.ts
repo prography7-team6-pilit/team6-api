@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FirebaseCloudMessagingModule } from './firebase_cloud_messaging';
+import { AllExceptionFilter } from './http-exception.filter.ts';
 import { MessageQueueModule } from './message_queue';
 import { PillManageModule } from './pill_manage/pill_manage.module';
 import { Eat } from './repo/entity/eat.entity';
@@ -36,7 +37,8 @@ import { UserManageModule } from './user_manage';
 		  FirebaseCloudMessagingModule,
 		  RepositoryModule,
 		  PillManageModule,
-		  UserManageModule
+		  UserManageModule,
+		  AllExceptionFilter
 		],
 })
 export class ApiModule {}

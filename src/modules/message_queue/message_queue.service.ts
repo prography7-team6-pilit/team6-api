@@ -4,7 +4,6 @@ import { RepositoryService } from '@modules/repo/repo.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bull';
-import e from 'express';
 import { Week } from './dto/enums/week.enum';
 import { JobRequestPostDto } from './dto/job.request.post.dto';
 import { JobResponseDto } from './dto/job.response.dto';
