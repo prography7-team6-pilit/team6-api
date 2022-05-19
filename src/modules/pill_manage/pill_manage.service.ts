@@ -21,10 +21,7 @@ export class PillManageService {
             eatDate:new Date(),
         }
         const result = await this.repo.repo_addPill(data);
-        //return result;
-
-        //Api dummy
-        return {result:true}
+        return result;    
     }
 
     async putPill(){
