@@ -1,3 +1,4 @@
+import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { RepositoryModule } from '@modules/repo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -17,7 +18,7 @@ import { UserManageService } from './user_manage.service';
         expiresIn:60000000000*600000000000,
       }
     }),
-    RepositoryModule
+    RepositoryModule,AllExceptionFilter
   ],
   controllers: [UserManageController],
   providers: [UserManageService,JwtStrategy],

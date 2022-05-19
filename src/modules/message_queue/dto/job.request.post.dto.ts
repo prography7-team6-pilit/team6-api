@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { Week } from "./enums/week.enum";
 
 export class JobRequestPostDto {

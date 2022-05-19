@@ -4,6 +4,7 @@ import { MessageQueueConsumer } from './message_queue.consumer';
 import { MessageQueueController } from './message_queue.controller';
 import { MessageQueueService } from './message_queue.service';
 import { RepositoryModule } from '@modules/repo';
+import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 
 
 @Module({
@@ -11,7 +12,8 @@ import { RepositoryModule } from '@modules/repo';
 		RepositoryModule,
 		BullModule.registerQueue({
 			name: 'message',
-		})
+		}),
+		AllExceptionFilter
 	],
 	controllers: [MessageQueueController],
 	providers: [MessageQueueService,MessageQueueConsumer],
