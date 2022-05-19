@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Res, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res, UseFilters, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { EatRequestDto } from './dto/eat.request.post.dto';
@@ -7,7 +7,9 @@ import { EatResponseDto } from './dto/eat.response.post.dto';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
 import { EatResponseMonthDto } from './dto/eat.response.month.dto';
 import { EatResponseMonthUnitDto } from './dto/eat.response.month.unit.dto';
+import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 
+@UseFilters(AllExceptionFilter)
 @Controller({
 	version: '1',
 	path: 'pills',
@@ -58,7 +60,11 @@ export class PillManageController {
     @UseGuards(JwtAuthGuard)
     @Post('/taking-logs')
     async takenPill(@Body(new ValidationPipe()) addEatDto:EatRequestDto,@Res() res:Response){
+        //Api dummy
+        return res.json({result:true})
+
         const result = await this.pillService.takePill(addEatDto);
         return res.json(result);
+
     }
 }
