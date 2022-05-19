@@ -1,14 +1,12 @@
-import { JobRequestPostDto } from '@modules/message_queue/dto/job.request.post.dto';
-import { JobResponseGetDto } from '@modules/message_queue/dto/job.response.get.dto';
-import { JobResponseUnitGetDto } from '@modules/message_queue/dto/job.response.get.unit.dto';
-import { UserRequestDto } from '@modules/user_manage/dto/user.request.dto';
-import { Injectable } from '@nestjs/common';
+import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
+import { Injectable, UseFilters } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, getConnection, Repository } from 'typeorm';
 import { Eat } from './entity/eat.entity';
 import { Job } from './entity/job.entity';
 import { User } from './entity/user.entity';
 
+@UseFilters(AllExceptionFilter)
 @Injectable()
 export class RepositoryService {
   constructor(

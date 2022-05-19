@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res, UseFilters } from '@nestjs/common';
 import { ApiCreatedResponse, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { UserRequestDto } from './dto/user.request.dto';
 import { UserResponseErrorDto } from './dto/user.error.dto';
 import { UserResponseDto } from './dto/user.reponse.dto';
 import { UserManageService } from './user_manage.service';
+import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 
+
+@UseFilters(AllExceptionFilter)
 @Controller({
 	version: '1',
 	path: 'users',
