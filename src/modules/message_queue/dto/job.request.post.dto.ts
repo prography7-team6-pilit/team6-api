@@ -17,6 +17,7 @@ export class JobRequestPostDto {
     enum: Week,
     example:['Mon','Fri']
   })
+  @IsNotEmpty()
   @IsEnum(Week,{each:true})
   readonly alertWeek:string[]
 
@@ -24,6 +25,7 @@ export class JobRequestPostDto {
     description: 'Notification 여부',
     example:true
   })
+  @IsNotEmpty()
   @IsBoolean()
   readonly isPush:boolean;
 
@@ -31,6 +33,7 @@ export class JobRequestPostDto {
     description: 'Notificatino 약 이름',
     example:"마그네슘"
   })
+  @IsNotEmpty()
   @IsString()
   readonly pillName:string;
 }
