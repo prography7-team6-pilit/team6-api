@@ -35,7 +35,7 @@ export class UserManageService {
 				alert:[],
 			};
 			const result = await this.repo.setNickname(userEntity);
-			const payload={result};
+			const payload={...result};
 			const accessToken = await this.jwtService.sign(payload);
 			return accessToken;	
 		}
