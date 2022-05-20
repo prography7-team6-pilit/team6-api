@@ -24,6 +24,6 @@ export class User {
   })
   firebasetoken: string;
 
-  @OneToMany(()=>Job,(job)=>job.alertId,{ nullable: true })
+  @OneToMany(()=>Job,(job)=>job.alertId,{ nullable: true ,cascade:["insert", "update","remove"]})
   alert:Job[]
 }

@@ -10,9 +10,9 @@ import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 @Module({
 	imports: [
 		RepositoryModule,
-		BullModule.registerQueue({
+		/*BullModule.registerQueue({
 			name: 'message',
-		}),
+		}),*/
 		AllExceptionFilter
 	],
 	controllers: [MessageQueueController],

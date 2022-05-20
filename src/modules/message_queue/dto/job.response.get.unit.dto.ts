@@ -8,7 +8,7 @@ export class JobResponseUnitGetDto {
     example:"1"
   })
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   readonly alertId: number;
 
   @ApiProperty({
@@ -25,6 +25,7 @@ export class JobResponseUnitGetDto {
     enum: Week,
     example:['Mon','Fri']
   })
+  @IsNotEmpty()
   @IsEnum(Week,{each:true})
   readonly alertWeek:string[]
 
@@ -32,6 +33,7 @@ export class JobResponseUnitGetDto {
     description: 'Notification 여부',
     example:true
   })
+  @IsNotEmpty()
   @IsBoolean()
   readonly isPush:boolean;
 
@@ -39,20 +41,23 @@ export class JobResponseUnitGetDto {
     description: 'Notificatino 약 이름',
     example:"마그네슘"
   })
-  @IsNumber()
+  @IsNotEmpty()
+  @IsString()
   readonly pillName:string;
 
   @ApiProperty({
     description: '약을 먹었는가?',
-    example:"마그네슘"
+    example:1
   })
+  @IsNotEmpty()
   @IsNumber()
   readonly eatId:number;
 
   @ApiProperty({
     description: '약을 먹었는가?',
-    example:"마그네슘"
+    example:true
   })
-  @IsNumber()
+  @IsNotEmpty()
+  @IsBoolean()
   readonly eatResult:boolean;
 }

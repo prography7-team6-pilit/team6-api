@@ -6,6 +6,7 @@ import { UserResponseErrorDto } from './dto/user.error.dto';
 import { UserResponseDto } from './dto/user.reponse.dto';
 import { UserManageService } from './user_manage.service';
 import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
+import { UserRequestGetDto } from './dto/user.response.get.dto';
 
 
 @UseFilters(AllExceptionFilter)
@@ -22,8 +23,8 @@ export class UserManageController {
 	@ApiForbiddenResponse({status:401,description:"인증 실패",type:UserResponseErrorDto})
 	@ApiQuery({name:'uuid',required:true,description:'uuid',example:'123e4567-e89b-12d3-a456-426614174000'})
 	@Get('/login')
-	async getUser(@Query('uuid') uuid:string,@Res() res:Response) {
-		const accessToken=await this.userService.signIn(uuid);
+	async getUser(@Query() requestData:UserRequestGetDto,@Res() res:Response) {
+		const accessToken=await this.userService.signIn(requestData.uuid);
 		if(accessToken){
 			const userResponse:UserResponseDto={
 				accessToken:accessToken,
@@ -36,7 +37,7 @@ export class UserManageController {
 				result:false,
 				error:"Unauthorized",
 			}
-			return res.json(userResponse);
+			return res.status(401).json(userResponse);
 		}
 		
 	}
@@ -59,7 +60,7 @@ export class UserManageController {
 				result:false,
 				error:"The user already exists."
 			}
-			return res.json(userResponse);
+			return res.status(401).json(userResponse);
 		}
 	}
 }
