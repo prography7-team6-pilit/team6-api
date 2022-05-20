@@ -17,6 +17,7 @@ export class MessageQueueService{//implements OnModuleDestroy{
     constructor(/*@InjectQueue('message') private msgq:Queue,*/private repo:RepositoryService){}
 
     async getPillAlert(year:number,month:number,day:number,userId:number):Promise<JobResponseGetDto|undefined>{ //작업목록 불러오기
+        console.log("asdf");
         const date:Date=await this.strTodate(year,month,day);
         const strWeek=Week[date.getDay()];
         const {weekJob,takeLogs}=await this.repo.repo_getJob(userId,date,strWeek);
@@ -45,7 +46,7 @@ export class MessageQueueService{//implements OnModuleDestroy{
                 alertId:weekJob.job_alertId,
                 alertTime:weekJob.job_alertTime,
                 alertWeek:arr,
-                isPush:weekJob.job_isPush,
+                isPush:Boolean(weekJob.job_isPush),
                 pillName:weekJob.job_pillName,
                 eatId:weekJob.eat_eatId,
                 eatResult:weekJob.eat_eatResult
