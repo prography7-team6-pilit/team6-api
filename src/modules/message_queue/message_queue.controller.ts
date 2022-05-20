@@ -1,13 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { JobResponseErrorDto } from './dto/job.error.dto';
 import { JobRequestPostDto } from './dto/job.request.post.dto';
 import { JobResponseDto } from './dto/job.response.dto';
 import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { MessageQueueService } from './message_queue.service';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
-import { Week } from './dto/enums/week.enum';
 import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { JobRequestGetDto } from './dto/job.request.get.dto';
@@ -76,6 +74,7 @@ export class MessageQueueController {
     async postAlert(@Body(new ValidationPipe()) requestData:JobRequestPostDto,@Req() req:Request, @Res() res:Response){
         const userId=req.user!.userId;
         const firebasetoken=req.user!.firebasetoken;
+        console.log(req.user);
         const saveJob=await this.msgq.postPillAlert(userId,firebasetoken,requestData);
         let result:JobResponsePostDto={result:false}
         if(saveJob){    
