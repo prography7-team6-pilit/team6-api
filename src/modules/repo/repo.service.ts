@@ -1,7 +1,9 @@
 import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
+import { Week } from '@modules/message_queue/dto/enums/week.enum';
 import { Injectable, UseFilters } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, getConnection, Repository } from 'typeorm';
+import { query } from 'express';
+import { Brackets, DeleteResult, getConnection, Repository, UpdateResult } from 'typeorm';
 import { Eat } from './entity/eat.entity';
 import { Job } from './entity/job.entity';
 import { User } from './entity/user.entity';
@@ -15,43 +17,66 @@ export class RepositoryService {
     @InjectRepository(Eat) private eatRepository:Repository<Eat>,
   ){}
 
+  async repo_getJob(id:number,date:Date,strWeek:string) {
+    const from_date = new Date(date).toISOString();
+    const to_date = new Date(date.setDate(date.getDate() + 1)).toISOString();
+    let weekQuery="job."+strWeek+" = true";
+  
+    const db=getConnection();
+    const takeLogs= await db.getRepository(Job)
+    .createQueryBuilder("job")
+    .select('job.alertId,eat.eatId')
+    .leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
+    .where("job.userId= :userId",{userId:id})
+    .andWhere(weekQuery)
+    .andWhere(new Brackets(qb => {
+      qb.where("eat.eatDate >= :from_date", { from_date: from_date })
+        .andWhere("eat.eatDate < :to_date", { to_date: to_date })
+    }))
+    .andWhere("job.IsRemoved =:removed",{removed:false})
+    .getRawMany();
+
+    const weekJob=await db.getRepository(Job)
+    .createQueryBuilder("job")
+    .where("job.userId= :userId",{userId:id})
+    .andWhere(weekQuery)
+    .andWhere("job.IsRemoved =:removed",{removed:false})
+    .getRawMany();
+
+
+    return {weekJob,takeLogs};
+  }
+
   async repo_saveJob(job:Job): Promise<Job> {
     const result=await this.jobRepository.save(job);
     return result;
   }
 
-  async repo_getJob(week:string,id:number,date:Date) {
-    const db=await getConnection();
+  async repo_putJob(alertId:number,job:Job) {
+    const result=await getConnection()
+    .createQueryBuilder()
+    .update(Job)
+    .set({
+      alertId:alertId,
+      alertTime: job.alertTime,
+      isPush: job.isPush,
+      userId: job.userId,
+      bullId: job.bullId,
+      pillName:job.pillName,
+      Mon: job.Mon,Tue: job.Tue,Wed: job.Wed,Thu: job.Thu,Fri: job.Fri,Sat: job.Sat,Sun: job.Sun,
+    })
+    .where("alertId = :alertId", { alertId: alertId })
+    .execute();
+    return result;
+  }
 
-    const from_date = new Date(date);
-    const to_date = new Date(date.setDate(date.getDate() + 1));
-
-    const jobLists= await db.getRepository(Job)
+  async repo_delJob(alertId:number):Promise<DeleteResult>{
+    const job=await getConnection().getRepository(Job)
     .createQueryBuilder("job")
-    .leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
-    .where("job.userId= :userId",{userId:id})
-    .andWhere("IsRemoved=false")
-    .andWhere('eat.eatDate >= :from_date', {
-      from_date: from_date,
-    })
-    .andWhere('eat.eatDate >= :to_date', {
-      to_date: to_date,
-    })
-    .orWhere('eatId is null')
-    .getRawMany();
-    await db.close();
-
-    return jobLists;
-  }
-
-  async repo_getPut(id:number): Promise<Eat[]|undefined> {
-    const job=await this.eatRepository.find({ alertId :id});
-    return job;
-  }
-
-  async repo_getDel(id:number):Promise<DeleteResult>{
-    const job=await this.jobRepository.delete({alertId:id});
-    //repeat에 등록된 job만 죽이면 될듯?
+    .update(Job)
+    .set({ IsRemoved:true })
+    .where("alertId = :alertId", { alertId: alertId })
+    .execute();
     return job;
   }
   //--------------------------------------------------------------
@@ -82,17 +107,36 @@ export class RepositoryService {
       to_date: to_date,
     })
     .getMany();
-    db.close();
-
   }
   async repo_addPill(eat:Eat){
     const result= await this.eatRepository.save(eat);
     return result;
   }
+  async repo_putPill(eatId:number){
+    const result=await getConnection()
+    .createQueryBuilder()
+    .delete()
+    .from(Eat)
+    .where("eatId = :eatId", { eatId: eatId })
+    .execute();
+    return result;
+  }
+
+  async repo_isTaked(alertId:number){
+    const now_data = new Date();
+    const from_date = now_data;
+    const to_date = new Date(now_data.setDate(now_data.getMonth() + 1));
+    const db=getConnection();
+    const logCheck= await db.getRepository(Eat)
+    .createQueryBuilder("eat")
+    .andWhere("eat.alertId=:alertId",{alertId:alertId})
+    .andWhere('eat.eatDate >= :from_date', {
+      from_date: from_date,
+    })
+    .andWhere('eat.eatDate >= :to_date', {
+      to_date: to_date,
+    })
+    .getRawOne();
+    return logCheck;
+  }
 }
-/*
-
-1	마그네슘	같이먹으면 좋아요!
-2	비타민C	이건 같이먹으면 좀 그런데 ..
-
-*/
