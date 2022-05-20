@@ -1,5 +1,5 @@
 export class JwtDto {
-    userId:string;
+    userId:number;
     uuid:string;
     nickname:string;
     firebasetoken:string;

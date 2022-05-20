@@ -16,12 +16,12 @@ import { UserManageModule } from './user_manage';
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
-		BullModule.forRoot({
+		/*BullModule.forRoot({
 			redis: {
 				host: process.env.REDIS_USER,
 				port: 6379,
 			  },
-		  }),
+		  }),*/
 		  TypeOrmModule.forRoot({
 			type: 'mysql',
 			host: process.env.DATABASE_HOST,

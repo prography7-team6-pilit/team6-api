@@ -78,11 +78,11 @@ export class Job {
   })
   IsRemoved: boolean;
   
-  @ManyToOne(()=>User,(user)=>user.userId)
+  @ManyToOne(()=>User,(user)=>user.userId,{onDelete:'CASCADE'})
   @JoinColumn({name:"userId"})
   userId:number;
 
-  @OneToMany(()=>Eat,(eat)=>eat.alertId, { eager: true })
+  @OneToMany(()=>Eat,(eat)=>eat.alertId, { eager: true , cascade:["insert", "update","remove"]})
   @JoinColumn({name:'eatId'})
   eat:Eat[];
 }
