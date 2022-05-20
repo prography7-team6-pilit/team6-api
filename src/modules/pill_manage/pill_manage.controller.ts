@@ -55,16 +55,19 @@ export class PillManageController {
 
     //대폭 수정필요. userId 없어도 가능.
     @ApiBearerAuth('access-token')
-    @ApiOperation({summary:'약 복용 여부'})
+    @ApiOperation({summary:'약 복용 여부 구현완료'})
     @ApiCreatedResponse({description:"복용이 안되어있는데 True, 체크해제되면 False",type:EatResponseDto})
     @UseGuards(JwtAuthGuard)
     @Post('/taking-logs')
     async takenPill(@Body(new ValidationPipe()) addEatDto:EatRequestDto,@Res() res:Response){
-        //Api dummy
-        return res.json({result:true})
-
         const result = await this.pillService.takePill(addEatDto);
-        return res.json(result);
-
+        if(result){
+            return res.json(result);
+        }
+        else{
+            return res.status(400).json({error:'Wrong alertId'})
+        }
+        //Api dummy
+        //return res.json({result:true})
     }
 }
