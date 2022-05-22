@@ -7,11 +7,8 @@ import { User } from './entity/user.entity';
 import { RepositoryService } from './repo.service';
 
 @Module({
-  imports:[
-    TypeOrmModule.forFeature([Eat,Job,User]),
-    AllExceptionFilter
-],
-  providers: [RepositoryService],
-  exports:[RepositoryService]
+	imports: [TypeOrmModule.forFeature([Eat, Job, User]), AllExceptionFilter],
+	providers: [RepositoryService],
+	exports: [RepositoryService],
 })
 export class RepositoryModule {}
