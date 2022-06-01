@@ -68,5 +68,7 @@ export class AlertService {
 		return pill.bullId;
 	}
 
-	private timeToCron(week: Week, time: string): string {}
+	private timeToCron(week: Week, time: string): string {
+		return '';
+	}
 }

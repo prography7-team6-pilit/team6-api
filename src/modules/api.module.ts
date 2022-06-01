@@ -1,8 +1,7 @@
-import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FirebaseCloudMessagingModule } from './firebase_cloud_messaging';
+
 import { AllExceptionFilter } from './http-exception.filter.ts';
 import { MessageQueueModule } from './message_queue';
 import { PillManageModule } from './pill_manage/pill_manage.module';
@@ -28,7 +27,6 @@ import { UserManageModule } from './user_manage';
 		}),
 		SampleModule,
 		MessageQueueModule,
-		FirebaseCloudMessagingModule,
 		RepositoryModule,
 		PillManageModule,
 		UserManageModule,
