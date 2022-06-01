@@ -16,29 +16,23 @@ import { UserManageModule } from './user_manage';
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
-		/*BullModule.forRoot({
-			redis: {
-				host: process.env.REDIS_USER,
-				port: 6379,
-			  },
-		  }),*/
-		  TypeOrmModule.forRoot({
+		TypeOrmModule.forRoot({
 			type: 'mysql',
 			host: process.env.DATABASE_HOST,
 			port: 3306,
 			username: process.env.DATABASE_USER,
 			password: process.env.DATABASE_PASSWORD,
 			database: process.env.DATABASE_NAME,
-			entities: [Job,User,Eat],
+			entities: [Job, User, Eat],
 			synchronize: true,
-		  }),
-		  SampleModule,
-		  MessageQueueModule,
-		  FirebaseCloudMessagingModule,
-		  RepositoryModule,
-		  PillManageModule,
-		  UserManageModule,
-		  AllExceptionFilter
-		],
+		}),
+		SampleModule,
+		MessageQueueModule,
+		FirebaseCloudMessagingModule,
+		RepositoryModule,
+		PillManageModule,
+		UserManageModule,
+		AllExceptionFilter,
+	],
 })
 export class ApiModule {}
