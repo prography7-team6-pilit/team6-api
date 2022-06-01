@@ -10,10 +10,10 @@ export class MessageQueueConsumer {
 
 	@Process('transcode')
 	async handleTranscode(job: Job<AlertDto>) {
-		const { firebaseToken, pillNames } = job.data;
-		console.log('pillNames', pillNames);
+		const { firebaseToken, pills } = job.data;
+		console.log('pills', pills);
 
-		// TODO: pillNames로 title, body 만들기
+		// TODO: pills로 title, body 만들기
 		await this.pushService.push({
 			firebaseToken,
 			title: '',

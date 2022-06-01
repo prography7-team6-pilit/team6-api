@@ -9,7 +9,6 @@ import { Eat } from './repo/entity/eat.entity';
 import { Job } from './repo/entity/job.entity';
 import { User } from './repo/entity/user.entity';
 import { RepositoryModule } from './repo/repo.module';
-import { SampleModule } from './sample';
 import { UserManageModule } from './user_manage';
 
 @Module({
@@ -25,7 +24,6 @@ import { UserManageModule } from './user_manage';
 			entities: [Job, User, Eat],
 			synchronize: true,
 		}),
-		SampleModule,
 		MessageQueueModule,
 		RepositoryModule,
 		PillManageModule,
