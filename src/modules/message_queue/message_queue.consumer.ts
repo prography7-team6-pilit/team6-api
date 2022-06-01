@@ -1,14 +1,25 @@
-import { Job } from 'bull';
 import { Process, Processor } from '@nestjs/bull';
+import { Job } from 'bull';
+
+import { AlertDto } from '../../core/types/alert-dto';
+import { PushService } from '../push';
 
 @Processor('message')
 export class MessageQueueConsumer {
-  @Process('transcode')
-  handleTranscode(job: Job) {
-    console.log("Start transcoding...");
-    console.log(job.data);
-    console.log('Transcoding completed');
-  }
+	constructor(private readonly pushService: PushService) {}
+
+	@Process('transcode')
+	async handleTranscode(job: Job<AlertDto>) {
+		const { firebaseToken, pillNames } = job.data;
+		console.log('pillNames', pillNames);
+
+		// TODO: pillNames로 title, body 만들기
+		await this.pushService.push({
+			firebaseToken,
+			title: '',
+			body: '',
+		});
+	}
 }
 
 //https://docs.nestjs.com/techniques/queues
