@@ -1,8 +1,9 @@
+import { JobResponsePostDto } from '@modules/message_queue/dto/job.response.post.dto';
+import { Eat } from '@modules/repo/entity/eat.entity';
 import { RepositoryService } from '@modules/repo/repo.service';
 import { Injectable } from '@nestjs/common';
+
 import { EatRequestDto } from './dto/eat.request.post.dto';
-import { Eat } from '@modules/repo/entity/eat.entity';
-import { JobResponsePostDto } from '@modules/message_queue/dto/job.response.post.dto';
 
 @Injectable()
 export class PillManageService {
@@ -32,6 +33,7 @@ export class PillManageService {
 		if (result.affected! > 0) {
 			return { result: false };
 		}
+		// TODO: 오늘 요일의 alert-times 조회해서 pillId 뽑고 pill 개수만큼 eat이 있으면 day-taking-log 찍기
 
 		return { result: true };
 	}

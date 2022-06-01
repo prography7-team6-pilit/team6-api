@@ -112,6 +112,7 @@ export class RepositoryService {
 	//--------------------------------------------------------------
 
 	async repo_getMonth(userId: number, date: Date) {
+		// TODO: day-taking-log 뽑아서 리턴
 		const from_date = date;
 		const to_date = new Date(date.setDate(date.getMonth() + 1));
 		const db = await getConnection();
