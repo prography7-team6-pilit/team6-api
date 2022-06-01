@@ -1,11 +1,11 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
-import { JobResponseUnitGetDto } from "./job.response.get.unit.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { JobResponseUnitGetDto } from './job.response.get.unit.dto';
 
 export class JobResponseGetDto {
-  @ApiProperty({
-    description: '오늘의 알림 목록',
-    example:`[
+	@ApiProperty({
+		description: '오늘의 알림 목록',
+		example: `[
         {
           "alertId": 7,
           "alertTime": "11:24",
@@ -15,6 +15,7 @@ export class JobResponseGetDto {
           "isPush": true,
           "pillName": "마그네슘",
           "eatId": 3,
+          "dosage":1,
           "eatResult": true
         },
         {
@@ -26,10 +27,11 @@ export class JobResponseGetDto {
           "isPush": true,
           "pillName": "마그네슘",
           "eatId": 0,
+          "dosage":1,
           "eatResult": false
         }
-      ]`
-  })
-  @IsNotEmpty()
-  readonly alerts: JobResponseUnitGetDto[];
+      ]`,
+	})
+	@IsNotEmpty()
+	readonly alerts: JobResponseUnitGetDto[];
 }

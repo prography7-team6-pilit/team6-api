@@ -63,6 +63,7 @@ export class RepositoryService {
 	}
 
 	async repo_putJob(alertId: number, job: Job) {
+		// await getConnection().getRepository(Job).save(job)
 		const result = await getConnection()
 			.createQueryBuilder()
 			.update(Job)
@@ -80,6 +81,7 @@ export class RepositoryService {
 				Fri: job.Fri,
 				Sat: job.Sat,
 				Sun: job.Sun,
+				dosage: job.dosage,
 			})
 			.where('alertId = :alertId', { alertId: alertId })
 			.execute();

@@ -11,139 +11,222 @@ import { JobResponseDto } from './dto/job.response.dto';
 import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 
-
 @Injectable()
-export class MessageQueueService{//implements OnModuleDestroy{
-    constructor(/*@InjectQueue('message') private msgq:Queue,*/private repo:RepositoryService){}
+export class MessageQueueService {
+	//implements OnModuleDestroy{
+	constructor(
+		/*@InjectQueue('message') private msgq:Queue,*/ private repo: RepositoryService,
+	) {}
 
-    async getPillAlert(year:number,month:number,day:number,userId:number):Promise<JobResponseGetDto|undefined>{ //작업목록 불러오기
-        console.log("asdf");
-        const date:Date=await this.strTodate(year,month,day);
-        const strWeek=Week[date.getDay()];
-        const {weekJob,takeLogs}=await this.repo.repo_getJob(userId,date,strWeek);
-        const result:JobResponseGetDto={alerts: []};
-        weekJob.forEach((weekJob)=>{
-            let arr=[];
-            if(weekJob.job_Mon==true){arr.push("Mon");}
-            if(weekJob.job_Tue==true){arr.push("Tue");}
-            if(weekJob.job_Wed==true){arr.push("Wed");}
-            if(weekJob.job_Thu==true){arr.push("Thu");}
-            if(weekJob.job_Fri==true){arr.push("Fri");}
-            if(weekJob.job_Sat==true){arr.push("Sat");}
-            if(weekJob.job_Sun==true){arr.push("Sun");}
+	async getPillAlert(
+		year: number,
+		month: number,
+		day: number,
+		userId: number,
+	): Promise<JobResponseGetDto | undefined> {
+		//작업목록 불러오기
+		const date: Date = await this.strTodate(year, month, day);
+		const strWeek = Week[date.getDay()];
+		const { weekJob, takeLogs } = await this.repo.repo_getJob(
+			userId,
+			date,
+			strWeek,
+		);
+		const result: JobResponseGetDto = { alerts: [] };
+		weekJob.forEach((weekJob) => {
+			let arr = [];
+			if (weekJob.job_Mon == true) {
+				arr.push('Mon');
+			}
+			if (weekJob.job_Tue == true) {
+				arr.push('Tue');
+			}
+			if (weekJob.job_Wed == true) {
+				arr.push('Wed');
+			}
+			if (weekJob.job_Thu == true) {
+				arr.push('Thu');
+			}
+			if (weekJob.job_Fri == true) {
+				arr.push('Fri');
+			}
+			if (weekJob.job_Sat == true) {
+				arr.push('Sat');
+			}
+			if (weekJob.job_Sun == true) {
+				arr.push('Sun');
+			}
 
-            weekJob.eat_eatId=0;
-            weekJob.eat_eatResult=false;
-            
-            takeLogs.forEach((log)=>{
-                if(weekJob.job_alertId===log.alertId){
-                    weekJob.eat_eatId=log.eat_eatId;
-                    weekJob.eat_eatResult=true;
-                }
-            });
+			weekJob.eat_eatId = 0;
+			weekJob.eat_eatResult = false;
 
-            let response:JobResponseUnitGetDto={
-                alertId:weekJob.job_alertId,
-                alertTime:weekJob.job_alertTime,
-                alertWeek:arr,
-                isPush:Boolean(weekJob.job_isPush),
-                pillName:weekJob.job_pillName,
-                eatId:weekJob.eat_eatId,
-                eatResult:weekJob.eat_eatResult
-            }
-            result.alerts.push(response);
-        });
-        return result;
-    }
+			takeLogs.forEach((log) => {
+				if (weekJob.job_alertId === log.alertId) {
+					weekJob.eat_eatId = log.eat_eatId;
+					weekJob.eat_eatResult = true;
+				}
+			});
 
-    async postPillAlert(userId:number,firebasetoken:string,requestData:JobRequestPostDto):Promise<Job>{
-        // const job=await this.msgq.add('transcode',{
-        //     userId,
-        //     firebasetoken,
-        //     jobDto            
-        // },
-        // {
-        //     repeat: { cron: "*/1 * * * *" }
-        // });
-        // const bullId = job.id.toString();
-        const bullId="1";
-        //--------------------------------
+			let response: JobResponseUnitGetDto = {
+				alertId: weekJob.job_alertId,
+				alertTime: weekJob.job_alertTime,
+				alertWeek: arr,
+				isPush: Boolean(weekJob.job_isPush),
+				pillName: weekJob.job_pillName,
+				eatId: weekJob.eat_eatId,
+				eatResult: weekJob.eat_eatResult,
+				dosage: weekJob.job_dosage,
+			};
+			result.alerts.push(response);
+		});
+		return result;
+	}
 
-        const jobEntity:Job={
-            alertId:0,
-            alertTime: requestData.alertTime,
-            isPush: requestData.isPush,
-            userId: userId,
-            bullId: bullId,
-            pillName:requestData.pillName,
-            Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
-            firebasetoken:firebasetoken,
-            IsRemoved:false
-        };
+	async postPillAlert(
+		userId: number,
+		firebasetoken: string,
+		requestData: JobRequestPostDto,
+	): Promise<Job> {
+		// const job=await this.msgq.add('transcode',{
+		//     userId,
+		//     firebasetoken,
+		//     jobDto
+		// },
+		// {
+		//     repeat: { cron: "*/1 * * * *" }
+		// });
+		// const bullId = job.id.toString();
+		const bullId = '1';
+		//--------------------------------
 
-        requestData.alertWeek.forEach(element => {
-            switch (element){
-            case "Mon":jobEntity.Mon=true;break;
-            case "Tue":jobEntity.Tue=true;break;
-            case "Wed":jobEntity.Wed=true;break;
-            case "Thu":jobEntity.Thu=true;break;
-            case "Fri":jobEntity.Fri=true;break;
-            case "Sat":jobEntity.Sat=true;break;
-            case "Sun":jobEntity.Sun=true;break;
-            }        
-        });
-        const saveJob=await this.repo.repo_saveJob(jobEntity); //res.user 의 userId 가져오기
-        return saveJob;
-    }
-    async putPillAlert(userId:number,firebasetoken:string,alertId:number,requestData:JobRequestPostDto):Promise<UpdateResult|undefined|any>{
-        //job 지웠다가 재생성하여 bullId에 값 입력하기
-        const bullId="1";
-        //--------------------------------
+		const jobEntity: Job = {
+			alertId: 0,
+			alertTime: requestData.alertTime,
+			isPush: requestData.isPush,
+			userId: userId,
+			bullId: bullId,
+			pillName: requestData.pillName,
+			Mon: false,
+			Tue: false,
+			Wed: false,
+			Thu: false,
+			Fri: false,
+			Sat: false,
+			Sun: false,
+			eat: [],
+			firebasetoken: firebasetoken,
+			IsRemoved: false,
+			dosage: requestData.dosage,
+		};
 
-        const jobEntity:Job={
-            alertId:alertId,
-            alertTime: requestData.alertTime,
-            isPush: requestData.isPush,
-            userId: userId,
-            bullId: bullId,
-            pillName:requestData.pillName,
-            Mon: false,Tue: false,Wed: false,Thu: false,Fri: false,Sat: false,Sun: false,eat:[],
-            firebasetoken:firebasetoken,
-            IsRemoved:false
-        };
+		requestData.alertWeek.forEach((element) => {
+			switch (element) {
+				case 'Mon':
+					jobEntity.Mon = true;
+					break;
+				case 'Tue':
+					jobEntity.Tue = true;
+					break;
+				case 'Wed':
+					jobEntity.Wed = true;
+					break;
+				case 'Thu':
+					jobEntity.Thu = true;
+					break;
+				case 'Fri':
+					jobEntity.Fri = true;
+					break;
+				case 'Sat':
+					jobEntity.Sat = true;
+					break;
+				case 'Sun':
+					jobEntity.Sun = true;
+					break;
+			}
+		});
+		const saveJob = await this.repo.repo_saveJob(jobEntity); //res.user 의 userId 가져오기
+		return saveJob;
+	}
+	async putPillAlert(
+		userId: number,
+		firebasetoken: string,
+		alertId: number,
+		requestData: JobRequestPostDto,
+	): Promise<UpdateResult | undefined | any> {
+		//job 지웠다가 재생성하여 bullId에 값 입력하기
+		const bullId = '1';
+		//--------------------------------
 
-        requestData.alertWeek.forEach(element => {
-            switch (element){
-            case "Mon":jobEntity.Mon=true;break;
-            case "Tue":jobEntity.Tue=true;break;
-            case "Wed":jobEntity.Wed=true;break;
-            case "Thu":jobEntity.Thu=true;break;
-            case "Fri":jobEntity.Fri=true;break;
-            case "Sat":jobEntity.Sat=true;break;
-            case "Sun":jobEntity.Sun=true;break;
-            }        
-        });
-        const putJob=await this.repo.repo_putJob(alertId,jobEntity); //res.user 의 userId 가져오기
-        return putJob;
-    }
+		const jobEntity: Job = {
+			alertId: alertId,
+			alertTime: requestData.alertTime,
+			isPush: requestData.isPush,
+			userId: userId,
+			bullId: bullId,
+			pillName: requestData.pillName,
+			Mon: false,
+			Tue: false,
+			Wed: false,
+			Thu: false,
+			Fri: false,
+			Sat: false,
+			Sun: false,
+			eat: [],
+			firebasetoken: firebasetoken,
+			IsRemoved: false,
+			dosage: requestData.dosage,
+		};
 
-    async deletePillAlert(alertId:number):Promise<JobResponseDto>{
-        const data=await this.repo.repo_delJob(alertId);
-        if(data){
-            return {result:true};
-        }
-        else{
-            return {result:false};
-        }
-    }
-    
-    /*async onModuleDestroy() {
+		requestData.alertWeek.forEach((element) => {
+			switch (element) {
+				case 'Mon':
+					jobEntity.Mon = true;
+					break;
+				case 'Tue':
+					jobEntity.Tue = true;
+					break;
+				case 'Wed':
+					jobEntity.Wed = true;
+					break;
+				case 'Thu':
+					jobEntity.Thu = true;
+					break;
+				case 'Fri':
+					jobEntity.Fri = true;
+					break;
+				case 'Sat':
+					jobEntity.Sat = true;
+					break;
+				case 'Sun':
+					jobEntity.Sun = true;
+					break;
+			}
+		});
+		const putJob = await this.repo.repo_putJob(alertId, jobEntity); //res.user 의 userId 가져오기
+		return putJob;
+	}
+
+	async deletePillAlert(alertId: number): Promise<JobResponseDto> {
+		const data = await this.repo.repo_delJob(alertId);
+		if (data) {
+			return { result: true };
+		} else {
+			return { result: false };
+		}
+	}
+
+	/*async onModuleDestroy() {
         await this.msgq.close();
     }*/
 
-    async strTodate(year:number,month:number,day:number){
-        const strDate = year+'-'+month.toString().padStart(2,'0')+'-'+day.toString().padStart(2,'0');
-        const dateDate = new Date(strDate);
-        return dateDate;
-    }
+	async strTodate(year: number, month: number, day: number) {
+		const strDate =
+			year +
+			'-' +
+			month.toString().padStart(2, '0') +
+			'-' +
+			day.toString().padStart(2, '0');
+		const dateDate = new Date(strDate);
+		return dateDate;
+	}
 }
