@@ -1,3 +1,4 @@
+import { AlertService, CreateAlertParams } from '@modules/alert';
 import { Eat } from '@modules/repo/entity/eat.entity';
 import { Job } from '@modules/repo/entity/job.entity';
 import { RepositoryService } from '@modules/repo/repo.service';
@@ -13,9 +14,9 @@ import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 
 @Injectable()
 export class MessageQueueService {
-	//implements OnModuleDestroy{
 	constructor(
-		/*@InjectQueue('message') private msgq:Queue,*/ private repo: RepositoryService,
+		private repo: RepositoryService,
+		private alertService: AlertService,
 	) {}
 
 	async getPillAlert(
@@ -87,24 +88,12 @@ export class MessageQueueService {
 		firebasetoken: string,
 		requestData: JobRequestPostDto,
 	): Promise<Job> {
-		// const job=await this.msgq.add('transcode',{
-		//     userId,
-		//     firebasetoken,
-		//     jobDto
-		// },
-		// {
-		//     repeat: { cron: "*/1 * * * *" }
-		// });
-		// const bullId = job.id.toString();
-		const bullId = '1';
-		//--------------------------------
-
 		const jobEntity: Job = {
 			alertId: 0,
 			alertTime: requestData.alertTime,
 			isPush: requestData.isPush,
 			userId: userId,
-			bullId: bullId,
+			bullId: '0',
 			pillName: requestData.pillName,
 			Mon: false,
 			Tue: false,
@@ -118,33 +107,53 @@ export class MessageQueueService {
 			IsRemoved: false,
 			dosage: requestData.dosage,
 		};
-
+		let weekstringToint: number[] = new Array();
 		requestData.alertWeek.forEach((element) => {
 			switch (element) {
 				case 'Mon':
 					jobEntity.Mon = true;
+					weekstringToint.push(1);
 					break;
 				case 'Tue':
 					jobEntity.Tue = true;
+					weekstringToint.push(2);
 					break;
 				case 'Wed':
 					jobEntity.Wed = true;
+					weekstringToint.push(3);
 					break;
 				case 'Thu':
 					jobEntity.Thu = true;
+					weekstringToint.push(4);
 					break;
 				case 'Fri':
 					jobEntity.Fri = true;
+					weekstringToint.push(5);
 					break;
 				case 'Sat':
 					jobEntity.Sat = true;
+					weekstringToint.push(6);
 					break;
 				case 'Sun':
 					jobEntity.Sun = true;
+					weekstringToint.push(1);
 					break;
 			}
 		});
-		const saveJob = await this.repo.repo_saveJob(jobEntity); //res.user 의 userId 가져오기
+		const saveJob = await this.repo.repo_saveJob(jobEntity);
+
+		weekstringToint.forEach(async (week) => {
+			const createAlert: CreateAlertParams = {
+				pillName: requestData.pillName,
+				firebaseToken: firebasetoken,
+				weekday: week,
+				time: requestData.alertTime,
+				userId: userId,
+				pillId: saveJob.alertId,
+			};
+			const bullId = await this.alertService.create(createAlert);
+			await this.repo.repo_updateJob(saveJob.alertId, bullId.alertId);
+		});
 		return saveJob;
 	}
 	async putPillAlert(
@@ -214,10 +223,6 @@ export class MessageQueueService {
 			return { result: false };
 		}
 	}
-
-	/*async onModuleDestroy() {
-        await this.msgq.close();
-    }*/
 
 	async strTodate(year: number, month: number, day: number) {
 		const strDate =

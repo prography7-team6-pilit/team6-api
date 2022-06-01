@@ -4,6 +4,7 @@ import {
 	Get,
 	Post,
 	Query,
+	Req,
 	Res,
 	UseFilters,
 	UseGuards,
@@ -15,7 +16,7 @@ import {
 	ApiOperation,
 	ApiTags,
 } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { EatRequestDto } from './dto/eat.request.post.dto';
 import { PillManageService } from './pill_manage.service';
 import { EatResponseDto } from './dto/eat.response.post.dto';
@@ -161,8 +162,10 @@ export class PillManageController {
 	async takenPill(
 		@Body(new ValidationPipe()) addEatDto: EatRequestDto,
 		@Res() res: Response,
+		@Req() req: Request,
 	) {
-		const result = await this.pillService.takePill(addEatDto);
+		const userId = req!.user!.userId;
+		const result = await this.pillService.takePill(addEatDto, userId);
 		if (result) {
 			return res.json(result);
 		} else {

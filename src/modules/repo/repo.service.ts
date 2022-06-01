@@ -10,6 +10,8 @@ import {
 	Repository,
 	UpdateResult,
 } from 'typeorm';
+import { AlertTime } from './entity/alert-time.entity';
+import { DayTakingLog } from './entity/day-taking-log.entity';
 import { Eat } from './entity/eat.entity';
 import { Job } from './entity/job.entity';
 import { User } from './entity/user.entity';
@@ -21,9 +23,13 @@ export class RepositoryService {
 		@InjectRepository(Job) private jobRepository: Repository<Job>,
 		@InjectRepository(User) private userRepository: Repository<User>,
 		@InjectRepository(Eat) private eatRepository: Repository<Eat>,
+		@InjectRepository(AlertTime)
+		private alertTimeRepository: Repository<AlertTime>,
+		@InjectRepository(DayTakingLog)
+		private dayTakingLogRepository: Repository<DayTakingLog>,
 	) {}
 
-	async repo_getJob(id: number, date: Date, strWeek: string) {
+	async repo_getJob(userId: number, date: Date, strWeek: string) {
 		const from_date = new Date(date).toISOString();
 		const to_date = new Date(date.setDate(date.getDate() + 1)).toISOString();
 		let weekQuery = 'job.' + strWeek + ' = true';
@@ -34,7 +40,7 @@ export class RepositoryService {
 			.createQueryBuilder('job')
 			.select('job.alertId,eat.eatId')
 			.leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
-			.where('job.userId= :userId', { userId: id })
+			.where('job.userId= :userId', { userId: userId })
 			.andWhere(weekQuery)
 			.andWhere(
 				new Brackets((qb) => {
@@ -49,7 +55,7 @@ export class RepositoryService {
 		const weekJob = await db
 			.getRepository(Job)
 			.createQueryBuilder('job')
-			.where('job.userId= :userId', { userId: id })
+			.where('job.userId= :userId', { userId: userId })
 			.andWhere(weekQuery)
 			.andWhere('job.IsRemoved =:removed', { removed: false })
 			.getRawMany();
@@ -60,6 +66,15 @@ export class RepositoryService {
 	async repo_saveJob(job: Job): Promise<Job> {
 		const result = await this.jobRepository.save(job);
 		return result;
+	}
+
+	async repo_updateJob(alertId: number, bullId: string) {
+		await getConnection()
+			.createQueryBuilder()
+			.update(Job)
+			.set({ bullId: bullId })
+			.where('alertId = :id', { id: alertId })
+			.execute();
 	}
 
 	async repo_putJob(alertId: number, job: Job) {
@@ -162,5 +177,16 @@ export class RepositoryService {
 			})
 			.getRawOne();
 		return logCheck;
+	}
+
+	async getAlertTimes(week: Week, userId: number) {
+		const result = this.alertTimeRepository.find({
+			week: week,
+			userId: userId,
+		});
+		return result;
+	}
+	async dayTakingLog(dayTakingLog: DayTakingLog) {
+		await this.dayTakingLogRepository.save(dayTakingLog);
 	}
 }

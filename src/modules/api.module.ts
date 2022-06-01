@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlertModule } from './alert';
 
 import { AllExceptionFilter } from './http-exception.filter.ts';
 import { MessageQueueModule } from './message_queue';
 import { PillManageModule } from './pill_manage/pill_manage.module';
+import { PushModule } from './push';
+import { AlertTime } from './repo/entity/alert-time.entity';
+import { DayTakingLog } from './repo/entity/day-taking-log.entity';
 import { Eat } from './repo/entity/eat.entity';
 import { Job } from './repo/entity/job.entity';
 import { User } from './repo/entity/user.entity';
@@ -21,13 +25,15 @@ import { UserManageModule } from './user_manage';
 			username: process.env.DATABASE_USER,
 			password: process.env.DATABASE_PASSWORD,
 			database: process.env.DATABASE_NAME,
-			entities: [Job, User, Eat],
+			entities: [Job, User, Eat, AlertTime, DayTakingLog],
 			synchronize: true,
 		}),
 		MessageQueueModule,
 		RepositoryModule,
 		PillManageModule,
 		UserManageModule,
+		AlertModule,
+		PushModule,
 		AllExceptionFilter,
 	],
 })

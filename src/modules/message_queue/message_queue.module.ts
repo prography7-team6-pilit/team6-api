@@ -1,3 +1,4 @@
+import { AlertModule } from '@modules/alert';
 import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { RepositoryModule } from '@modules/repo';
 import { Module } from '@nestjs/common';
@@ -8,14 +9,7 @@ import { MessageQueueController } from './message_queue.controller';
 import { MessageQueueService } from './message_queue.service';
 
 @Module({
-	imports: [
-		RepositoryModule,
-		/*BullModule.registerQueue({
-			name: 'message',
-		}),*/
-		AllExceptionFilter,
-		PushModule,
-	],
+	imports: [RepositoryModule, AllExceptionFilter, PushModule, AlertModule],
 	controllers: [MessageQueueController],
 	providers: [MessageQueueService, MessageQueueConsumer],
 	exports: [MessageQueueService],

@@ -1,13 +1,18 @@
 import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlertTime } from './entity/alert-time.entity';
+import { DayTakingLog } from './entity/day-taking-log.entity';
 import { Eat } from './entity/eat.entity';
 import { Job } from './entity/job.entity';
 import { User } from './entity/user.entity';
 import { RepositoryService } from './repo.service';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Eat, Job, User]), AllExceptionFilter],
+	imports: [
+		TypeOrmModule.forFeature([Eat, Job, User, AlertTime, DayTakingLog]),
+		AllExceptionFilter,
+	],
 	providers: [RepositoryService],
 	exports: [RepositoryService],
 })

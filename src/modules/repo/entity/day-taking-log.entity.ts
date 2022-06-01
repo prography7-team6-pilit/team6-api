@@ -13,6 +13,12 @@ export class DayTakingLog {
 
 	@Column({
 		type: 'int',
+		name: 'takeStatus',
+	})
+	takeStatus: number;
+
+	@Column({
+		type: 'int',
 		name: 'userId',
 	})
 	userId: number;

@@ -41,24 +41,31 @@ export class AlertService {
 	}: CreateAlertParams): Promise<{ alertId: string }> {
 		const alertId = await this.getAlertIdByAlertTime(weekday, time, userId);
 		if (alertId) {
-			// TODO: 틀알럿 조회해서 업데이트 -> pills에 추가해서 업데이트
-			return { alertId: '1' };
+			// finished TODO: 틀알럿 조회해서 업데이트 -> pills에 추가해서 업데이트
+			const bullId = await this.alertQueue.getJob(alertId);
+			await bullId?.remove();
 		}
 
-		const alert = await this.alertQueue.add({
-			firebaseToken,
-			pills: [
-				{
-					name: pillName,
-					pillId,
-				},
-			],
-		});
+		const alert = await this.alertQueue.add(
+			{
+				firebaseToken,
+				pills: [
+					{
+						name: pillName,
+						pillId,
+					},
+				],
+			},
+			{
+				repeat: { cron: this.timeToCron(weekday, time) },
+			},
+		);
+		console.log(alert);
 		return { alertId: `${alert.id}` };
 	}
 
 	async update({}: UpdateAlertParams): Promise<void> {
-		// 1. 기존 alert 조회하고 pills에서 삭제
+		// TODO: 1. 기존 alert 조회하고 pills에서 삭제
 		// 2. this.create(...)
 	}
 
@@ -72,6 +79,7 @@ export class AlertService {
 			time,
 			userId,
 		});
+		console.log('alertTime', alertTime);
 		if (!alertTime) {
 			return;
 		}
@@ -86,6 +94,11 @@ export class AlertService {
 	}
 
 	private timeToCron(week: Week, time: string): string {
-		return '';
+		const hourMinute = time.split(':');
+
+		const cron = `0 ${hourMinute[1]} ${hourMinute[0]} * * ${week}`;
+		// finished TODO: time to cron
+		console.log(cron);
+		return cron;
 	}
 }

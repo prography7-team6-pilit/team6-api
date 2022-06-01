@@ -8,16 +8,26 @@ import { PushService } from '../push';
 export class MessageQueueConsumer {
 	constructor(private readonly pushService: PushService) {}
 
-	@Process('transcode')
+	@Process()
 	async handleTranscode(job: Job<AlertDto>) {
 		const { firebaseToken, pills } = job.data;
-		console.log('pills', pills);
-
-		// TODO: pills로 title, body 만들기
+		console.log('pills', job.data);
+		const title = `약 먹을 시간입니다.`;
+		let body = `복용해야할 약 목록은`;
+		let count = 0;
+		pills.forEach((element) => {
+			if (count == 0) {
+				body = `${body} ${element.name}`;
+			} else {
+				body = `${body},${element.name}`;
+			}
+		});
+		body = `${body} 입니다`;
+		// finished TODO: pills로 title, body 만들기
 		await this.pushService.push({
 			firebaseToken,
-			title: '',
-			body: '',
+			title: title,
+			body: body,
 		});
 	}
 }
