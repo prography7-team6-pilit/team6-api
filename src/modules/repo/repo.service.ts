@@ -7,6 +7,7 @@ import {
 	Brackets,
 	DeleteResult,
 	getConnection,
+	getRepository,
 	Repository,
 	UpdateResult,
 } from 'typeorm';
@@ -29,46 +30,90 @@ export class RepositoryService {
 		private dayTakingLogRepository: Repository<DayTakingLog>,
 	) {}
 
-	async repo_getJob(userId: number, date: Date, strWeek: string) {
+	async getJogByDay(
+		userId: number,
+		year: number,
+		month: number,
+		day: number,
+	): Promise<AlertTime[]> {
+		const date: Date = await this.strTodate(year, month, day);
+		const weekNum = Week[date.getDay()];
+		const jobTime = await getRepository(AlertTime)
+			.createQueryBuilder('alerttime')
+			.where('week=:week', { week: weekNum })
+			.andWhere('userId=:userId', { userId: userId })
+			.getMany();
+		return jobTime;
+	}
+	async getInofoByPillId(pillId: number): Promise<Job> {
+		const jobInfo = await this.jobRepository.findOneOrFail({
+			alertId: pillId,
+			IsRemoved: false,
+		});
+		return jobInfo;
+	}
+	async getTakeOrNot(
+		userId: number,
+		alertId: number,
+		year: number,
+		month: number,
+		day: number,
+	) {
+		const date: Date = await this.strTodate(year, month, day);
 		const from_date = new Date(date).toISOString();
 		const to_date = new Date(date.setDate(date.getDate() + 1)).toISOString();
-		let weekQuery = 'job.' + strWeek + ' = true';
-
-		const db = getConnection();
-		const takeLogs = await db
-			.getRepository(Job)
-			.createQueryBuilder('job')
-			.select('job.alertId,eat.eatId')
-			.leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
-			.where('job.userId= :userId', { userId: userId })
-			.andWhere(weekQuery)
+		const takeLogs = await getRepository(Eat)
+			.createQueryBuilder()
+			.where('userId=:userId', { userId: userId })
+			.andWhere('alertId=:alertId', { alertId: alertId })
 			.andWhere(
 				new Brackets((qb) => {
-					qb.where('eat.eatDate >= :from_date', {
+					qb.where('eatDate >= :from_date', {
 						from_date: from_date,
-					}).andWhere('eat.eatDate < :to_date', { to_date: to_date });
+					}).andWhere('eatDate < :to_date', { to_date: to_date });
 				}),
 			)
-			.andWhere('job.IsRemoved =:removed', { removed: false })
-			.getRawMany();
-
-		const weekJob = await db
-			.getRepository(Job)
-			.createQueryBuilder('job')
-			.where('job.userId= :userId', { userId: userId })
-			.andWhere(weekQuery)
-			.andWhere('job.IsRemoved =:removed', { removed: false })
-			.getRawMany();
-
-		return { weekJob, takeLogs };
+			.getOne();
+		return takeLogs;
 	}
 
-	async repo_saveJob(job: Job): Promise<Job> {
-		const result = await this.jobRepository.save(job);
+	async repo_saveJobInfo(
+		isPush: boolean,
+		bullId: string,
+		firebasetoken: string,
+		pillName: string,
+		userId: number,
+		dosage: number,
+	): Promise<{ alertId: number }> {
+		const data = await this.jobRepository.create({
+			isPush,
+			bullId,
+			firebasetoken,
+			pillName,
+			userId,
+			dosage,
+			IsRemoved: false,
+		});
+		const result = await this.jobRepository.save(data);
+		return { alertId: result.alertId };
+	}
+	async repo_saveJobTime(
+		week: number,
+		time: string,
+		userId: number,
+		pillId: number,
+	): Promise<AlertTime> {
+		const data = await this.alertTimeRepository.create({
+			week,
+			time,
+			userId,
+			pillId,
+		});
+		const result = await this.alertTimeRepository.save(data);
 		return result;
 	}
 
-	async repo_updateJob(alertId: number, bullId: string) {
+	async repo_updateJobAlertId(alertId: number, bullId: string) {
 		await getConnection()
 			.createQueryBuilder()
 			.update(Job)
@@ -84,7 +129,7 @@ export class RepositoryService {
 			.update(Job)
 			.set({
 				alertId: alertId,
-				alertTime: job.alertTime,
+				/*alertTime: job.alertTime,
 				isPush: job.isPush,
 				userId: job.userId,
 				bullId: job.bullId,
@@ -95,7 +140,7 @@ export class RepositoryService {
 				Thu: job.Thu,
 				Fri: job.Fri,
 				Sat: job.Sat,
-				Sun: job.Sun,
+				Sun: job.Sun,*/
 				dosage: job.dosage,
 			})
 			.where('alertId = :alertId', { alertId: alertId })
@@ -103,15 +148,20 @@ export class RepositoryService {
 		return result;
 	}
 
-	async repo_delJob(alertId: number): Promise<DeleteResult> {
+	async repo_delJob(userId: number, alertId: number): Promise<DeleteResult> {
 		const job = await getConnection()
 			.getRepository(Job)
 			.createQueryBuilder('job')
 			.update(Job)
 			.set({ IsRemoved: true })
 			.where('alertId = :alertId', { alertId: alertId })
+			.andWhere('userId = :userId', { userId: userId })
 			.execute();
 		return job;
+	}
+	async getBullIdByalertId(alertId: number): Promise<string> {
+		const id = await this.jobRepository.findOneOrFail({ alertId: alertId });
+		return id.bullId;
 	}
 	//--------------------------------------------------------------
 
@@ -150,7 +200,7 @@ export class RepositoryService {
 	}
 
 	// camel
-	async putPill(eatId: number) {
+	async putPill(eatId: number): Promise<DeleteResult> {
 		const result = await getConnection()
 			.createQueryBuilder()
 			.delete()
@@ -160,13 +210,11 @@ export class RepositoryService {
 		return result;
 	}
 
-	async isTaked(alertId: number) {
+	async isTaked(alertId: number): Promise<Eat> {
 		const now_data = new Date();
 		const from_date = now_data;
 		const to_date = new Date(now_data.setDate(now_data.getMonth() + 1));
-		const db = await getConnection();
-		const logCheck = await db
-			.getRepository(Eat)
+		const logCheck = await getRepository(Eat)
 			.createQueryBuilder('eat')
 			.andWhere('eat.alertId=:alertId', { alertId: alertId })
 			.andWhere('eat.eatDate >= :from_date', {
@@ -175,7 +223,7 @@ export class RepositoryService {
 			.andWhere('eat.eatDate >= :to_date', {
 				to_date: to_date,
 			})
-			.getRawOne();
+			.getOneOrFail();
 		return logCheck;
 	}
 
@@ -188,5 +236,17 @@ export class RepositoryService {
 	}
 	async dayTakingLog(dayTakingLog: DayTakingLog) {
 		await this.dayTakingLogRepository.save(dayTakingLog);
+	}
+
+	////////////////////////////////////////////
+	async strTodate(year: number, month: number, day: number) {
+		const strDate =
+			year +
+			'-' +
+			month.toString().padStart(2, '0') +
+			'-' +
+			day.toString().padStart(2, '0');
+		const dateDate = new Date(strDate);
+		return dateDate;
 	}
 }
