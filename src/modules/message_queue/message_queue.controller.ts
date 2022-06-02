@@ -76,11 +76,14 @@ export class MessageQueueController {
 	) {
 		const userId = req.user!.userId;
 		const firebasetoken = req.user!.firebasetoken;
-		console.log(req.user);
 		const saveJob = await this.msgq.postPillAlert(
+			requestData.alertTime,
+			requestData.isPush,
+			requestData.pillName,
+			requestData.alertWeek,
 			userId,
 			firebasetoken,
-			requestData,
+			requestData.dosage,
 		);
 		let result: JobResponsePostDto = { result: false };
 		if (saveJob) {
@@ -126,7 +129,11 @@ export class MessageQueueController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		const result = await this.msgq.deletePillAlert(requestDeleteData.alertId);
+		const userId = req.user!.userId;
+		const result = await this.msgq.deletePillAlert(
+			userId,
+			requestDeleteData.alertId,
+		);
 		return res.json(result);
 	}
 }

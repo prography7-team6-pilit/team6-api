@@ -3,7 +3,7 @@ import { Eat } from '@modules/repo/entity/eat.entity';
 import { Job } from '@modules/repo/entity/job.entity';
 import { RepositoryService } from '@modules/repo/repo.service';
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { ConsoleLogger, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bull';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { Week } from './dto/enums/week.enum';
@@ -25,136 +25,87 @@ export class MessageQueueService {
 		day: number,
 		userId: number,
 	): Promise<JobResponseGetDto | undefined> {
-		//작업목록 불러오기
-		const date: Date = await this.strTodate(year, month, day);
-		const strWeek = Week[date.getDay()];
-		const { weekJob, takeLogs } = await this.repo.repo_getJob(
-			userId,
-			date,
-			strWeek,
-		);
 		const result: JobResponseGetDto = { alerts: [] };
-		weekJob.forEach((weekJob) => {
-			let arr = [];
-			if (weekJob.job_Mon == true) {
-				arr.push('Mon');
-			}
-			if (weekJob.job_Tue == true) {
-				arr.push('Tue');
-			}
-			if (weekJob.job_Wed == true) {
-				arr.push('Wed');
-			}
-			if (weekJob.job_Thu == true) {
-				arr.push('Thu');
-			}
-			if (weekJob.job_Fri == true) {
-				arr.push('Fri');
-			}
-			if (weekJob.job_Sat == true) {
-				arr.push('Sat');
-			}
-			if (weekJob.job_Sun == true) {
-				arr.push('Sun');
-			}
-
-			weekJob.eat_eatId = 0;
-			weekJob.eat_eatResult = false;
-
-			takeLogs.forEach((log) => {
-				if (weekJob.job_alertId === log.alertId) {
-					weekJob.eat_eatId = log.eat_eatId;
-					weekJob.eat_eatResult = true;
+		const todayJobTimes = await this.repo.getJogByDay(userId, year, month, day);
+		let checkingArr = new Array();
+		for (const element of todayJobTimes) {
+			if (checkingArr.indexOf(element.pillId) >= 0) {
+				for (const id of result.alerts) {
+					if (id.alertId == element.pillId) {
+						id.alertTime.push(element.time);
+					}
+					if (id.alertWeek.indexOf(Week[element.week]) < 0) {
+						id.alertWeek.push(Week[element.week]);
+					}
 				}
-			});
-
-			let response: JobResponseUnitGetDto = {
-				alertId: weekJob.job_alertId,
-				alertTime: weekJob.job_alertTime,
-				alertWeek: arr,
-				isPush: Boolean(weekJob.job_isPush),
-				pillName: weekJob.job_pillName,
-				eatId: weekJob.eat_eatId,
-				eatResult: weekJob.eat_eatResult,
-				dosage: weekJob.job_dosage,
+				continue;
+			}
+			checkingArr.push(element.pillId);
+			const todayJobInfos = await this.repo.getInofoByPillId(element.pillId);
+			const eatInfo = await this.repo.getTakeOrNot(
+				userId,
+				element.pillId,
+				year,
+				month,
+				day,
+			);
+			let alert: JobResponseUnitGetDto = {
+				alertId: todayJobInfos.alertId,
+				alertTime: [element.time],
+				alertWeek: [Week[element.week]],
+				isPush: todayJobInfos.isPush,
+				pillName: todayJobInfos.pillName,
+				dosage: todayJobInfos.dosage,
+				eatId: 0,
+				eatResult: false,
 			};
-			result.alerts.push(response);
-		});
+			if (eatInfo) {
+				alert.eatId = eatInfo.eatId;
+				alert.eatResult = true;
+			}
+			result.alerts.push(alert);
+		}
 		return result;
 	}
 
 	async postPillAlert(
+		alertTime: string[],
+		isPush: boolean,
+		pillName: string,
+		alertWeek: Week[],
 		userId: number,
 		firebasetoken: string,
-		requestData: JobRequestPostDto,
-	): Promise<Job> {
-		const jobEntity: Job = {
-			alertId: 0,
-			alertTime: requestData.alertTime,
-			isPush: requestData.isPush,
-			userId: userId,
-			bullId: '0',
-			pillName: requestData.pillName,
-			Mon: false,
-			Tue: false,
-			Wed: false,
-			Thu: false,
-			Fri: false,
-			Sat: false,
-			Sun: false,
-			eat: [],
-			firebasetoken: firebasetoken,
-			IsRemoved: false,
-			dosage: requestData.dosage,
-		};
-		let weekstringToint: number[] = new Array();
-		requestData.alertWeek.forEach((element) => {
-			switch (element) {
-				case 'Mon':
-					jobEntity.Mon = true;
-					weekstringToint.push(1);
-					break;
-				case 'Tue':
-					jobEntity.Tue = true;
-					weekstringToint.push(2);
-					break;
-				case 'Wed':
-					jobEntity.Wed = true;
-					weekstringToint.push(3);
-					break;
-				case 'Thu':
-					jobEntity.Thu = true;
-					weekstringToint.push(4);
-					break;
-				case 'Fri':
-					jobEntity.Fri = true;
-					weekstringToint.push(5);
-					break;
-				case 'Sat':
-					jobEntity.Sat = true;
-					weekstringToint.push(6);
-					break;
-				case 'Sun':
-					jobEntity.Sun = true;
-					weekstringToint.push(1);
-					break;
+		dosage: number,
+	): Promise<Boolean> {
+		const infoData = await this.repo.repo_saveJobInfo(
+			isPush,
+			'1',
+			firebasetoken,
+			pillName,
+			userId,
+			dosage,
+		);
+		for (const week of alertWeek) {
+			for (const time of alertTime) {
+				const saveTime = await this.repo.repo_saveJobTime(
+					week,
+					time,
+					userId,
+					infoData.alertId,
+				);
+				const createAlert: CreateAlertParams = {
+					pillName: pillName,
+					firebaseToken: firebasetoken,
+					weekday: week,
+					time: time,
+					userId: userId,
+					pillId: infoData.alertId,
+				};
+				const bullId = await this.alertService.create(createAlert);
+				await this.repo.repo_updateJobAlertId(infoData.alertId, bullId.alertId);
 			}
-		});
-		const saveJob = await this.repo.repo_saveJob(jobEntity);
-
-		weekstringToint.forEach(async (week) => {
-			const createAlert: CreateAlertParams = {
-				pillName: requestData.pillName,
-				firebaseToken: firebasetoken,
-				weekday: week,
-				time: requestData.alertTime,
-				userId: userId,
-				pillId: saveJob.alertId,
-			};
-			const bullId = await this.alertService.create(createAlert);
-			await this.repo.repo_updateJob(saveJob.alertId, bullId.alertId);
-		});
-		return saveJob;
+		}
+		return true;
 	}
 	async putPillAlert(
 		userId: number,
@@ -166,7 +117,7 @@ export class MessageQueueService {
 		const bullId = '1';
 		//--------------------------------
 
-		const jobEntity: Job = {
+		/*const jobEntity: Job = {
 			alertId: alertId,
 			alertTime: requestData.alertTime,
 			isPush: requestData.isPush,
@@ -212,26 +163,21 @@ export class MessageQueueService {
 			}
 		});
 		const putJob = await this.repo.repo_putJob(alertId, jobEntity); //res.user 의 userId 가져오기
-		return putJob;
+		return putJob;*/
+		return;
 	}
 
-	async deletePillAlert(alertId: number): Promise<JobResponseDto> {
-		const data = await this.repo.repo_delJob(alertId);
+	async deletePillAlert(
+		userId: number,
+		alertId: number,
+	): Promise<JobResponseDto> {
+		const jobId = await this.repo.getBullIdByalertId(alertId);
+		await this.alertService.remove(jobId);
+		const data = await this.repo.repo_delJob(userId, alertId);
 		if (data) {
 			return { result: true };
 		} else {
 			return { result: false };
 		}
-	}
-
-	async strTodate(year: number, month: number, day: number) {
-		const strDate =
-			year +
-			'-' +
-			month.toString().padStart(2, '0') +
-			'-' +
-			day.toString().padStart(2, '0');
-		const dateDate = new Date(strDate);
-		return dateDate;
 	}
 }
