@@ -15,14 +15,15 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsNumber()
-	alertId: number;
+	readonly alertId: number;
 
 	@ApiProperty({
 		description: 'Notification 시간',
-		example: ['10:24', '15:34', '17:01'],
+		example: '10:24',
 	})
 	@IsNotEmpty()
-	alertTime: string[];
+	@IsString()
+	readonly alertTime: string;
 
 	@ApiProperty({
 		description: 'Notification 요일',
@@ -32,7 +33,7 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsEnum(Week, { each: true })
-	alertWeek: string[];
+	readonly alertWeek: string[];
 
 	@ApiProperty({
 		description: 'Notification 여부',
@@ -40,7 +41,7 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsBoolean()
-	isPush: boolean;
+	readonly isPush: boolean;
 
 	@ApiProperty({
 		description: 'Notificatino 약 이름',
@@ -48,7 +49,7 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsString()
-	pillName: string;
+	readonly pillName: string;
 
 	@ApiProperty({
 		description: '약을 먹었는가?',
@@ -56,7 +57,7 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsNumber()
-	eatId: number;
+	readonly eatId: number;
 
 	@ApiProperty({
 		description: '복용량',
@@ -64,7 +65,7 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsNumber()
-	dosage: number;
+	readonly dosage: number;
 
 	@ApiProperty({
 		description: '약을 먹었는가?',
@@ -72,5 +73,5 @@ export class JobResponseUnitGetDto {
 	})
 	@IsNotEmpty()
 	@IsBoolean()
-	eatResult: boolean;
+	readonly eatResult: boolean;
 }

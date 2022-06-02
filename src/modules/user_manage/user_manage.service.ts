@@ -6,39 +6,41 @@ import { UserRequestDto } from './dto/user.request.dto';
 
 @Injectable()
 export class UserManageService {
-	constructor(
-		private readonly jwtService: JwtService,
-		private readonly repo: RepositoryService,
-	) {}
-
-	async signIn(uuid: string): Promise<string | undefined> {
-		try {
-			const result = await this.repo.getNickname(uuid);
-			if (result) {
-				const payload = { ...result };
+	constructor(private readonly jwtService:JwtService,
+		private readonly repo:RepositoryService){}
+		
+	async signIn(uuid:string):Promise<string | undefined>{
+		try{
+			const result=await this.repo.getNickname(uuid);
+			if(result){
+				const payload={...result};
 				const accessToken = this.jwtService.sign(payload);
 				return accessToken;
-			} else {
-				return undefined;
 			}
-		} catch {
-			return undefined;
+			else{
+				return undefined
+			}
+		}
+		catch{
+			return undefined
 		}
 	}
-	async signUp(userDto: UserRequestDto): Promise<string | undefined> {
-		try {
-			const userEntity: User = {
-				userId: 0,
-				uuid: userDto.uuid,
-				nickname: userDto.nickname,
-				firebasetoken: userDto.firebasetoken,
+	async signUp(userDto:UserRequestDto):Promise<string | undefined>{
+		try{
+			const userEntity:User={
+				userId:0,
+				uuid:userDto.uuid,
+				nickname:userDto.nickname,
+				firebasetoken:userDto.firebasetoken,
+				alert:[],
 			};
 			const result = await this.repo.setNickname(userEntity);
-			const payload = { ...result };
+			const payload={...result};
 			const accessToken = await this.jwtService.sign(payload);
-			return accessToken;
-		} catch {
-			return undefined;
+			return accessToken;	
+		}
+		catch{
+			return undefined
 		}
 	}
 }

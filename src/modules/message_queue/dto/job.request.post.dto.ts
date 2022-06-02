@@ -11,10 +11,11 @@ import { Week } from './enums/week.enum';
 export class JobRequestPostDto {
 	@ApiProperty({
 		description: 'Notification 시간',
-		example: ['10:24', '15:34', '17:01'],
+		example: '10:24',
 	})
 	@IsNotEmpty()
-	alertTime: string[];
+	@IsString()
+	readonly alertTime: string;
 
 	@ApiProperty({
 		description: 'Notification 요일',
@@ -24,7 +25,7 @@ export class JobRequestPostDto {
 	})
 	@IsNotEmpty()
 	@IsEnum(Week, { each: true })
-	readonly alertWeek: Week[];
+	readonly alertWeek: string[];
 
 	@ApiProperty({
 		description: 'Notification 여부',

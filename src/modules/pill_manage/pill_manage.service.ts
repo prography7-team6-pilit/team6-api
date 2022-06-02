@@ -25,7 +25,6 @@ export class PillManageService {
 		if (!isTaked) {
 			const eat: Eat = {
 				eatId: 0,
-				userId: userId,
 				alertId: requestDto.alertId,
 				eatDate: new Date(),
 			};
@@ -34,7 +33,7 @@ export class PillManageService {
 			return { result: true };
 		}
 
-		const result = await this.repo.putPill(isTaked.eatId);
+		const result = await this.repo.putPill(isTaked.eat_eatId);
 		if (result.affected! > 0) {
 			await this.setStatus(userId);
 			return { result: false };
@@ -59,7 +58,7 @@ export class PillManageService {
 		return new Date().getDay();
 	}
 	async setStatus(userId: number) {
-		/*const todayLogs = await this.repo.repo_getJob(
+		const todayLogs = await this.repo.repo_getJob(
 			userId,
 			new Date(),
 			Week[await this.getTodayWeek()],
@@ -80,6 +79,6 @@ export class PillManageService {
 			userId: userId,
 			takeStatus: takeStatusCode,
 		};
-		await this.repo.dayTakingLog(dayTakingLog);*/
+		await this.repo.dayTakingLog(dayTakingLog);
 	}
 }

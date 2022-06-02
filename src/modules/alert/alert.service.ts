@@ -69,12 +69,6 @@ export class AlertService {
 		// 2. this.create(...)
 	}
 
-	async remove(alertId: string) {
-		const alert = await this.alertQueue.getJob(alertId);
-		await alert?.remove();
-		return;
-	}
-
 	private async getAlertIdByAlertTime(
 		weekday: Week,
 		time: string,
