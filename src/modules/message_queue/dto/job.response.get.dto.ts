@@ -1,35 +1,44 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
-import { JobResponseUnitGetDto } from "./job.response.get.unit.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { JobResponseUnitGetDto } from './job.response.get.unit.dto';
 
 export class JobResponseGetDto {
-  @ApiProperty({
-    description: '오늘의 알림 목록',
-    example:`[
+	@ApiProperty({
+		description: '오늘의 알림 목록',
+		example: `{
+      "alerts": [
         {
-          "alertId": 7,
-          "alertTime": "11:24",
+          "alertId": 178,
+          "alertTime": [
+            "12:24"
+          ],
           "alertWeek": [
-            "Fri"
+            "Mon"
           ],
           "isPush": true,
           "pillName": "마그네슘",
-          "eatId": 3,
-          "eatResult": true
+          "dosage": 2,
+          "alertTimeId": 239,
+          "eatResult": false
         },
         {
-          "alertId": 8,
-          "alertTime": "10:24",
+          "alertId": 179,
+          "alertTime": [
+            "17:01"
+          ],
           "alertWeek": [
+            "Mon",
             "Fri"
           ],
           "isPush": true,
-          "pillName": "마그네슘",
-          "eatId": 0,
-          "eatResult": false
-        }
-      ]`
-  })
-  @IsNotEmpty()
-  readonly alerts: JobResponseUnitGetDto[];
+          "pillName": "비타민A",
+          "dosage": 6,
+          "alertTimeId": 240,
+          "eatResult": true
+        },
+      ]
+    }`,
+	})
+	@IsNotEmpty()
+	readonly alerts: JobResponseUnitGetDto[];
 }

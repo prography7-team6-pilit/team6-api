@@ -1,5 +1,6 @@
 # env files
 /.env
+pillit_firebase_key.json
 
 # compiled output
 /dist

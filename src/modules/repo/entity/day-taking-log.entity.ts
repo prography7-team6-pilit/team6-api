@@ -1,25 +1,25 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('Eat')
-export class Eat {
+@Entity('DayTakingLog')
+export class DayTakingLog {
 	@PrimaryGeneratedColumn()
-	eatId: number;
+	id: number;
 
 	@Column({
 		type: 'date',
-		name: 'eatDate',
+		name: 'date',
 	})
-	eatDate: Date;
+	date: Date;
+
+	@Column({
+		type: 'int',
+		name: 'takeStatus',
+	})
+	takeStatus: number;
 
 	@Column({
 		type: 'int',
 		name: 'userId',
 	})
 	userId: number;
-
-	@Column({
-		type: 'int',
-		name: 'alertTimeId',
-	})
-	alertTimeId: number;
 }

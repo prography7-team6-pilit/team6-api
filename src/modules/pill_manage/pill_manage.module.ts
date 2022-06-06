@@ -6,8 +6,8 @@ import { PillManageController } from './pill_manage.controller';
 import { PillManageService } from './pill_manage.service';
 
 @Module({
-    imports:[RepositoryModule,UserManageModule,AllExceptionFilter],
-    controllers: [PillManageController],
+	imports: [RepositoryModule, UserManageModule, AllExceptionFilter],
+	controllers: [PillManageController],
 	providers: [PillManageService],
 	exports: [PillManageService],
 })
