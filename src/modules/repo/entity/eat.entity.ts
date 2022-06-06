@@ -6,8 +6,7 @@ export class Eat {
 	eatId: number;
 
 	@Column({
-		type: 'timestamp',
-		default: () => 'CURRENT_TIMESTAMP',
+		type: 'date',
 		name: 'eatDate',
 	})
 	eatDate: Date;
@@ -20,7 +19,7 @@ export class Eat {
 
 	@Column({
 		type: 'int',
-		name: 'alertId',
+		name: 'alertTimeId',
 	})
-	alertId: number;
+	alertTimeId: number;
 }

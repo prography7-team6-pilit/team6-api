@@ -1,4 +1,4 @@
-import { FcmService } from '@doracoder/fcm-nestjs';
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
 interface PushParams {
@@ -9,25 +9,38 @@ interface PushParams {
 
 @Injectable()
 export class PushService {
-	constructor(private fcmServcie: FcmService) {}
-
+	constructor(private http: HttpService) {}
 	async push({ firebaseToken, title, body }: PushParams): Promise<void> {
-		console.log('firebaseToken, title, body', firebaseToken, title, body);
-		// TODO: firebase 푸시 보내기
-		const notification = {
-			body: body,
-			title: title,
-			link: '',
+		const payload = {
+			data: {
+				title: title,
+				body: body,
+			},
+			to: firebaseToken,
 		};
-		const data = {
-			body: body,
-			title: title,
-			link: '',
-		};
-		await this.fcmServcie.sendNotification(
-			[firebaseToken],
-			{ data: data, notification: notification },
-			true,
-		);
+		const response = await this.sendFcmMessage(payload);
+	}
+
+	private async sendFcmMessage(fcmMessage: any) {
+		const HOST = 'https://fcm.googleapis.com/fcm/send';
+		const http = this.http;
+		try {
+			const url = HOST;
+			const headersRequest = {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + process.env.FIREBASE_SERVER_KEY,
+			};
+			const response = await http
+				.post(url, JSON.stringify(fcmMessage), {
+					headers: headersRequest,
+				})
+				.toPromise();
+			if (!response) {
+				return false;
+			}
+			return await response!.data;
+		} catch (err) {
+			return { error: err };
+		}
 	}
 }

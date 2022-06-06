@@ -2,9 +2,9 @@ import { Week } from '@modules/message_queue/dto/enums/week.enum';
 import { AlertTime } from '@modules/repo/entity/alert-time.entity';
 import { Job } from '@modules/repo/entity/job.entity';
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Queue } from 'bull';
+import Bull, { Queue } from 'bull';
 import { Repository } from 'typeorm';
 
 import { AlertDto } from '../../core/types';
@@ -40,52 +40,55 @@ export class AlertService {
 		pillId,
 	}: CreateAlertParams): Promise<{ alertId: string }> {
 		const alertId = await this.getAlertIdByAlertTime(weekday, time, userId);
+		let pills = [{ name: pillName, pillId }];
 		if (alertId) {
-			// finished TODO: 틀알럿 조회해서 업데이트 -> pills에 추가해서 업데이트
-			const bullId = await this.alertQueue.getJob(alertId);
-			await bullId?.remove();
+			this.alertQueue.getJob(alertId).then((job) => {
+				job?.update({
+					firebaseToken,
+					pills: [...pills, ...job.data.pills],
+				});
+			});
+			return { alertId: `${alertId}` };
 		}
-
 		const alert = await this.alertQueue.add(
 			{
 				firebaseToken,
-				pills: [
-					{
-						name: pillName,
-						pillId,
-					},
-				],
+				pills: pills,
 			},
 			{
 				repeat: { cron: this.timeToCron(weekday, time) },
 			},
 		);
-		console.log(alert);
 		return { alertId: `${alert.id}` };
 	}
 
-	async update({}: UpdateAlertParams): Promise<void> {
-		// TODO: 1. 기존 alert 조회하고 pills에서 삭제
-		// 2. this.create(...)
-	}
-
-	async remove(alertId: string) {
-		const alert = await this.alertQueue.getJob(alertId);
-		await alert?.remove();
-		return;
+	async removeOne(alertId: Bull.JobId, pillId: number, firebaseToken: string) {
+		this.alertQueue.getJob(alertId).then(async (job) => {
+			const pillData = job!.data.pills;
+			const idx = pillData.findIndex(function (item) {
+				return item.pillId === pillId;
+			});
+			if (idx > -1) {
+				pillData.splice(idx, 1);
+			}
+			await job!.update({
+				firebaseToken,
+				pills: [...pillData],
+			});
+			return;
+		});
 	}
 
 	private async getAlertIdByAlertTime(
 		weekday: Week,
 		time: string,
 		userId: number,
-	): Promise<string | void> {
+	): Promise<Bull.JobId | void> {
 		const alertTime = await this.alertTimeRepository.findOne({
 			week: weekday,
 			time,
 			userId,
 		});
-		console.log('alertTime', alertTime);
 		if (!alertTime) {
 			return;
 		}
@@ -103,8 +106,6 @@ export class AlertService {
 		const hourMinute = time.split(':');
 
 		const cron = `0 ${hourMinute[1]} ${hourMinute[0]} * * ${week}`;
-		// finished TODO: time to cron
-		console.log(cron);
 		return cron;
 	}
 }

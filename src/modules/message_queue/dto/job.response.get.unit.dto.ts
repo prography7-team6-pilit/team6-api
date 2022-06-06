@@ -10,7 +10,7 @@ import { Week } from './enums/week.enum';
 
 export class JobResponseUnitGetDto {
 	@ApiProperty({
-		description: 'Notification 고유번호',
+		description: '알람 고유번호',
 		example: '1',
 	})
 	@IsNotEmpty()
@@ -18,14 +18,22 @@ export class JobResponseUnitGetDto {
 	alertId: number;
 
 	@ApiProperty({
-		description: 'Notification 시간',
+		description: '알람의시간 고유번호',
+		example: 1,
+	})
+	@IsNotEmpty()
+	@IsNumber()
+	alertTimeId: number;
+
+	@ApiProperty({
+		description: '알람 시간',
 		example: ['10:24', '15:34', '17:01'],
 	})
 	@IsNotEmpty()
 	alertTime: string[];
 
 	@ApiProperty({
-		description: 'Notification 요일',
+		description: '알람 요일',
 		isArray: true,
 		enum: Week,
 		example: ['Mon', 'Fri'],
@@ -35,7 +43,7 @@ export class JobResponseUnitGetDto {
 	alertWeek: string[];
 
 	@ApiProperty({
-		description: 'Notification 여부',
+		description: '알림 여부',
 		example: true,
 	})
 	@IsNotEmpty()
@@ -43,20 +51,12 @@ export class JobResponseUnitGetDto {
 	isPush: boolean;
 
 	@ApiProperty({
-		description: 'Notificatino 약 이름',
+		description: '약 이름',
 		example: '마그네슘',
 	})
 	@IsNotEmpty()
 	@IsString()
 	pillName: string;
-
-	@ApiProperty({
-		description: '약을 먹었는가?',
-		example: 1,
-	})
-	@IsNotEmpty()
-	@IsNumber()
-	eatId: number;
 
 	@ApiProperty({
 		description: '복용량',
@@ -67,7 +67,7 @@ export class JobResponseUnitGetDto {
 	dosage: number;
 
 	@ApiProperty({
-		description: '약을 먹었는가?',
+		description: '복용여부',
 		example: true,
 	})
 	@IsNotEmpty()

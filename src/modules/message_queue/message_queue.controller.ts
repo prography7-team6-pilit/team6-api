@@ -11,7 +11,6 @@ import {
 	Res,
 	UseFilters,
 	UseGuards,
-	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common';
 import {
@@ -19,7 +18,6 @@ import {
 	ApiCreatedResponse,
 	ApiOperation,
 	ApiParam,
-	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
@@ -98,24 +96,34 @@ export class MessageQueueController {
 	@UseGuards(JwtAuthGuard)
 	@Put('/:alertId')
 	async putAlert(
-		@Body(new ValidationPipe()) requestPostData: JobRequestPostDto,
+		@Body(new ValidationPipe()) jobAlertData: JobRequestPostDto,
 		@Param() requestPutData: JobRequestPutDto,
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
+		let result: JobResponsePostDto = { result: false };
 		const userId = req.user!.userId;
 		const firebasetoken = req.user!.firebasetoken;
-		const data = await this.msgq.putPillAlert(
+		const removeJob = await this.msgq.completeDeletePillAlert(
+			requestPutData.alertId,
+		);
+		if (!removeJob) {
+			return res.json(result);
+		}
+
+		const saveJob = await this.msgq.postPillAlert(
+			jobAlertData.alertTime,
+			jobAlertData.isPush,
+			jobAlertData.pillName,
+			jobAlertData.alertWeek,
 			userId,
 			firebasetoken,
-			requestPutData.alertId,
-			requestPostData,
+			jobAlertData.dosage,
 		);
-		let responseData = { result: false };
-		if (data.affected > 0) {
-			responseData.result = true;
+		if (saveJob) {
+			result.result = true;
 		}
-		return res.json(responseData);
+		return res.json(result);
 	}
 
 	@ApiBearerAuth('access-token')
@@ -130,7 +138,7 @@ export class MessageQueueController {
 		@Res() res: Response,
 	) {
 		const userId = req.user!.userId;
-		const result = await this.msgq.deletePillAlert(
+		const result = await this.msgq.softDeletePillAlert(
 			userId,
 			requestDeleteData.alertId,
 		);

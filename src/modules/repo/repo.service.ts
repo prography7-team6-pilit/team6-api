@@ -1,6 +1,6 @@
 import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { Week } from '@modules/message_queue/dto/enums/week.enum';
-import { Injectable, UseFilters } from '@nestjs/common';
+import { ConsoleLogger, Injectable, UseFilters } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { query } from 'express';
 import {
@@ -9,7 +9,6 @@ import {
 	getConnection,
 	getRepository,
 	Repository,
-	UpdateResult,
 } from 'typeorm';
 import { AlertTime } from './entity/alert-time.entity';
 import { DayTakingLog } from './entity/day-taking-log.entity';
@@ -30,14 +29,17 @@ export class RepositoryService {
 		private dayTakingLogRepository: Repository<DayTakingLog>,
 	) {}
 
-	async getJogByDay(
+	async getJobByDay(
 		userId: number,
 		year: number,
 		month: number,
 		day: number,
 	): Promise<AlertTime[]> {
-		const date: Date = await this.strTodate(year, month, day);
-		const weekNum = Week[date.getDay()];
+		const strDate = `${year}-${month.toString().padStart(2, '0')}-${day
+			.toString()
+			.padStart(2, '0')}`;
+		const date = new Date(strDate);
+		const weekNum: Week = await this.dayToweek(date.getDay());
 		const jobTime = await getRepository(AlertTime)
 			.createQueryBuilder('alerttime')
 			.where('week=:week', { week: weekNum })
@@ -45,8 +47,8 @@ export class RepositoryService {
 			.getMany();
 		return jobTime;
 	}
-	async getInofoByPillId(pillId: number): Promise<Job> {
-		const jobInfo = await this.jobRepository.findOneOrFail({
+	async getInofoByPillId(pillId: number): Promise<Job | void> {
+		const jobInfo = await this.jobRepository.findOne({
 			alertId: pillId,
 			IsRemoved: false,
 		});
@@ -54,27 +56,33 @@ export class RepositoryService {
 	}
 	async getTakeOrNot(
 		userId: number,
-		alertId: number,
+		alertTimeId: number,
 		year: number,
 		month: number,
 		day: number,
 	) {
-		const date: Date = await this.strTodate(year, month, day);
-		const from_date = new Date(date).toISOString();
-		const to_date = new Date(date.setDate(date.getDate() + 1)).toISOString();
-		const takeLogs = await getRepository(Eat)
-			.createQueryBuilder()
-			.where('userId=:userId', { userId: userId })
-			.andWhere('alertId=:alertId', { alertId: alertId })
-			.andWhere(
-				new Brackets((qb) => {
-					qb.where('eatDate >= :from_date', {
-						from_date: from_date,
-					}).andWhere('eatDate < :to_date', { to_date: to_date });
-				}),
-			)
-			.getOne();
+		const takeLogs = await getRepository(Eat).findOne({
+			userId: userId,
+			alertTimeId: alertTimeId,
+			eatDate: `${year}-${month}-${day}`,
+		});
 		return takeLogs;
+	}
+	async getWeekByalertId(alertId: number): Promise<Week[]> {
+		const alerts = await this.alertTimeRepository.find({ pillId: alertId });
+		let result: Week[] = new Array();
+		for (const alert of alerts) {
+			result.push(alert.week);
+		}
+		const resultSet = new Set(result);
+		return [...resultSet];
+	}
+	async getTakeOrNotByDay(userId: number, onlyDate: Date): Promise<Eat[]> {
+		const result = await this.eatRepository.find({
+			userId: userId,
+			eatDate: onlyDate,
+		});
+		return result;
 	}
 
 	async repo_saveJobInfo(
@@ -98,7 +106,7 @@ export class RepositoryService {
 		return { alertId: result.alertId };
 	}
 	async repo_saveJobTime(
-		week: number,
+		week: Week,
 		time: string,
 		userId: number,
 		pillId: number,
@@ -122,33 +130,7 @@ export class RepositoryService {
 			.execute();
 	}
 
-	async repo_putJob(alertId: number, job: Job) {
-		// await getConnection().getRepository(Job).save(job)
-		const result = await getConnection()
-			.createQueryBuilder()
-			.update(Job)
-			.set({
-				alertId: alertId,
-				/*alertTime: job.alertTime,
-				isPush: job.isPush,
-				userId: job.userId,
-				bullId: job.bullId,
-				pillName: job.pillName,
-				Mon: job.Mon,
-				Tue: job.Tue,
-				Wed: job.Wed,
-				Thu: job.Thu,
-				Fri: job.Fri,
-				Sat: job.Sat,
-				Sun: job.Sun,*/
-				dosage: job.dosage,
-			})
-			.where('alertId = :alertId', { alertId: alertId })
-			.execute();
-		return result;
-	}
-
-	async repo_delJob(userId: number, alertId: number): Promise<DeleteResult> {
+	async softDelJob(userId: number, alertId: number): Promise<DeleteResult> {
 		const job = await getConnection()
 			.getRepository(Job)
 			.createQueryBuilder('job')
@@ -159,9 +141,27 @@ export class RepositoryService {
 			.execute();
 		return job;
 	}
-	async getBullIdByalertId(alertId: number): Promise<string> {
-		const id = await this.jobRepository.findOneOrFail({ alertId: alertId });
-		return id.bullId;
+	async completeRemoveJob(alertId: number): Promise<boolean> {
+		const deleteJob = await this.jobRepository.delete({ alertId: alertId });
+		if (!deleteJob) {
+			return false;
+		}
+		return true;
+	}
+	async completeRemoveAlert(alertId: number): Promise<boolean> {
+		const deleteAlert = await this.alertTimeRepository.delete({
+			pillId: alertId,
+		});
+		if (!deleteAlert) {
+			return false;
+		}
+		return true;
+	}
+	async getbullidByalertId(alertId: number): Promise<Job> {
+		const id = await this.jobRepository.findOneOrFail({
+			alertId: alertId,
+		});
+		return id;
 	}
 	//--------------------------------------------------------------
 
@@ -176,24 +176,32 @@ export class RepositoryService {
 	}
 	//--------------------------------------------------------------
 
-	async repo_getMonth(userId: number, date: Date) {
+	async getMonthData(userId: number, year: number, month: number) {
 		// TODO: day-taking-log 뽑아서 리턴
-		const from_date = date;
-		const to_date = new Date(date.setDate(date.getMonth() + 1));
-		const db = await getConnection();
-		const jobLists = await db
-			.getRepository(Job)
-			.createQueryBuilder('job')
-			.leftJoinAndMapMany('job.eatId', Eat, 'eat', 'eat.alertId = job.alertId')
-			.where('eatId=')
-			.andWhere('eat.eatDate >= :from_date', {
-				from_date: from_date,
+		const firstDay = new Date(
+			`${year}-${month.toString().padStart(2, '0')}-01`,
+		);
+		const lastDay = new Date(
+			firstDay.getFullYear(),
+			firstDay.getMonth() + 1,
+			0,
+		).toLocaleDateString();
+		const statusList = await getConnection()
+			.getRepository(DayTakingLog)
+			.createQueryBuilder()
+			.where('userId=:userId', { userId: userId })
+			.andWhere('date >= :from_date', {
+				from_date: firstDay,
 			})
-			.andWhere('eat.eatDate >= :to_date', {
-				to_date: to_date,
+			.andWhere('date >= :to_date', {
+				to_date: lastDay,
 			})
 			.getMany();
+
+		console.log(firstDay, lastDay);
+		return statusList;
 	}
+
 	async addPill(eat: Eat) {
 		const result = await this.eatRepository.save(eat);
 		return result;
@@ -210,20 +218,15 @@ export class RepositoryService {
 		return result;
 	}
 
-	async isTaked(alertId: number): Promise<Eat> {
-		const now_data = new Date();
-		const from_date = now_data;
-		const to_date = new Date(now_data.setDate(now_data.getMonth() + 1));
+	async isTaked(alertTimeId: number): Promise<Eat | undefined> {
+		const now_data = new Date(new Date().toLocaleDateString());
 		const logCheck = await getRepository(Eat)
-			.createQueryBuilder('eat')
-			.andWhere('eat.alertId=:alertId', { alertId: alertId })
-			.andWhere('eat.eatDate >= :from_date', {
-				from_date: from_date,
+			.createQueryBuilder()
+			.andWhere('alertTimeId=:alertTimeId', { alertTimeId: alertTimeId })
+			.andWhere('eatDate= :now_data', {
+				now_data: now_data,
 			})
-			.andWhere('eat.eatDate >= :to_date', {
-				to_date: to_date,
-			})
-			.getOneOrFail();
+			.getOne();
 		return logCheck;
 	}
 
@@ -234,19 +237,56 @@ export class RepositoryService {
 		});
 		return result;
 	}
-	async dayTakingLog(dayTakingLog: DayTakingLog) {
-		await this.dayTakingLogRepository.save(dayTakingLog);
+	async dayTakingLog(userId: number, dayTakingLog: DayTakingLog) {
+		const todaydata = await this.dayTakingLogRepository.findOne({
+			date: new Date(new Date().toLocaleDateString()),
+			userId: userId,
+		});
+		if (!todaydata) {
+			await this.dayTakingLogRepository.save(dayTakingLog);
+		}
+		await this.dayTakingLogRepository.update(
+			{
+				date: new Date(new Date().toLocaleDateString()),
+				userId: userId,
+			},
+			{ takeStatus: dayTakingLog.takeStatus },
+		);
+		return;
 	}
-
-	////////////////////////////////////////////
-	async strTodate(year: number, month: number, day: number) {
-		const strDate =
-			year +
-			'-' +
-			month.toString().padStart(2, '0') +
-			'-' +
-			day.toString().padStart(2, '0');
-		const dateDate = new Date(strDate);
-		return dateDate;
+	async getTodayJob(userId: number, nowDate: Date) {
+		const now = await this.dayToweek(nowDate.getDay());
+		const result = await this.alertTimeRepository.find({
+			week: now,
+			userId,
+		});
+		return result;
+	}
+	async dayToweek(day: number): Promise<Week> {
+		let result: Week = Week.Sun;
+		switch (day) {
+			case 0:
+				result = Week.Sun;
+				break;
+			case 1:
+				result = Week.Mon;
+				break;
+			case 2:
+				result = Week.Tue;
+				break;
+			case 3:
+				result = Week.Wed;
+				break;
+			case 4:
+				result = Week.Thu;
+				break;
+			case 5:
+				result = Week.Fri;
+				break;
+			case 6:
+				result = Week.Sat;
+				break;
+		}
+		return result;
 	}
 }

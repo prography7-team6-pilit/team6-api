@@ -11,7 +11,6 @@ export class MessageQueueConsumer {
 	@Process()
 	async handleTranscode(job: Job<AlertDto>) {
 		const { firebaseToken, pills } = job.data;
-		console.log('pills', job.data);
 		const title = `약 먹을 시간입니다.`;
 		let body = `복용해야할 약 목록은`;
 		let count = 0;

@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -27,6 +28,12 @@ import { UserManageModule } from './user_manage';
 			database: process.env.DATABASE_NAME,
 			entities: [Job, User, Eat, AlertTime, DayTakingLog],
 			synchronize: true,
+		}),
+		BullModule.forRoot({
+			redis: {
+				host: process.env.REDIS_USER,
+				port: 6379,
+			},
 		}),
 		MessageQueueModule,
 		RepositoryModule,

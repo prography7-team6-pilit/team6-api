@@ -4,7 +4,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('AlertTime')
 export class AlertTime {
 	@PrimaryGeneratedColumn()
-	id: number;
+	alertTimeId: number;
 
 	@Column({
 		type: 'text',
