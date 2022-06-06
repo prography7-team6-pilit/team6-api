@@ -10,16 +10,16 @@ export class JobResponseGetDto {
         {
           "alertId": 178,
           "alertTime": [
-            "12:24"
+            "12:11"
           ],
           "alertWeek": [
-            "Mon"
+            "Mon","Fri"
           ],
           "isPush": true,
-          "pillName": "마그네슘",
-          "dosage": 2,
+          "pillName": "비타1",
+          "dosage": 1,
           "alertTimeId": 239,
-          "eatResult": false
+          "eatResult": true
         },
         {
           "alertId": 179,
@@ -27,15 +27,28 @@ export class JobResponseGetDto {
             "17:01"
           ],
           "alertWeek": [
-            "Mon",
-            "Fri"
+            "Mon"
           ],
           "isPush": true,
-          "pillName": "비타민A",
-          "dosage": 6,
+          "pillName": "마그네슘",
+          "dosage": 1,
           "alertTimeId": 240,
-          "eatResult": true
+          "eatResult": false
         },
+        {
+          "alertId": 180,
+          "alertTime": [
+            "19:24"
+          ],
+          "alertWeek": [
+            "Mon","Thu"
+          ],
+          "isPush": true,
+          "pillName": "철분1",
+          "dosage": 1,
+          "alertTimeId": 241,
+          "eatResult": false
+        }
       ]
     }`,
 	})
