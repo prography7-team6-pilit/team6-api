@@ -2,7 +2,7 @@ name: CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy-prod:
@@ -12,50 +12,51 @@ jobs:
       name: production
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    # Configure AWS credentials
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-northeast-2
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
-    # Deploy image to ECR
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      # Deploy image to ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Create .env file
-      run: |
-        touch .env
-        echo DATABASE_HOST=${{ secrets.DATABASE_HOST }} >> .env
-        echo DATABASE_NAME=${{ secrets.DATABASE_NAME }} >> .env
-        echo DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} >> .env
-        echo DATABASE_USER=${{ secrets.DATABASE_USER }} >> .env
-        echo REDIS_USER=${{ secrets.REDIS_USER }} >> .env
-        echo JWT=${{ secrets.JWT }} >> .env
-        cat .env
+      - name: Create .env file
+        run: |
+          touch .env
+          echo DATABASE_HOST=${{ secrets.DATABASE_HOST }} >> .env
+          echo DATABASE_NAME=${{ secrets.DATABASE_NAME }} >> .env
+          echo DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} >> .env
+          echo DATABASE_USER=${{ secrets.DATABASE_USER }} >> .env
+          echo REDIS_USER=${{ secrets.REDIS_USER }} >> .env
+          echo FIREBASE_SERVER_KEY=${{ secrets.FIREBASE_SERVER_KEY }} >> .env
+          echo JWT=${{ secrets.JWT }} >> .env
+          cat .env
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: 7team6-api
-        IMAGE_TAG: prod
-        GITHUB_SHA: ${{ github.sha }}
-      # TODO: 가장 최근에 달린 태그 달아서 배포하기
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: 7team6-api
+          IMAGE_TAG: prod
+          GITHUB_SHA: ${{ github.sha }}
+        # TODO: 가장 최근에 달린 태그 달아서 배포하기
 
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod-$GITHUB_SHA
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    # Update ECS services
-    - name: Update ECS services
-      run: |
-        aws ecs update-service --force-new-deployment --service team6-api --cluster team6
+      # Update ECS services
+      - name: Update ECS services
+        run: |
+          aws ecs update-service --force-new-deployment --service team6-api --cluster team6
