@@ -18,14 +18,6 @@ export class JobResponseUnitGetDto {
 	alertId: number;
 
 	@ApiProperty({
-		description: '알람의시간 고유번호',
-		example: 1,
-	})
-	@IsNotEmpty()
-	@IsNumber()
-	alertTimeId: number;
-
-	@ApiProperty({
 		description: '알람 시간',
 		example: ['10:24', '15:34', '17:01'],
 	})

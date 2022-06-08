@@ -71,11 +71,14 @@ export class AlertService {
 			if (idx > -1) {
 				pillData.splice(idx, 1);
 			}
-			await job!.update({
-				firebaseToken,
-				pills: [...pillData],
-			});
-			return;
+			if (pillData == null) {
+				await job!.remove();
+			} else {
+				await job!.update({
+					firebaseToken,
+					pills: [...pillData],
+				});
+			}
 		});
 	}
 

@@ -26,13 +26,11 @@ import { JobResponseDto } from './dto/job.response.dto';
 import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { MessageQueueService } from './message_queue.service';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
-import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { JobRequestGetDto } from './dto/job.request.get.dto';
 import { JobResponsePostDto } from './dto/job.response.post.dto';
 import { JobRequestPutDto } from './dto/job.request.put.dto';
 import { JobRequestDeleteDto } from './dto/job.request.delete.dto';
 
-@UseFilters(AllExceptionFilter)
 @Controller({
 	version: '1',
 	path: 'pill-alerts',

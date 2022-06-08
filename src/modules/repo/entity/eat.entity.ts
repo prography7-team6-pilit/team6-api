@@ -19,7 +19,7 @@ export class Eat {
 
 	@Column({
 		type: 'int',
-		name: 'alertTimeId',
+		name: 'alertId',
 	})
-	alertTimeId: number;
+	alertId: number;
 }
