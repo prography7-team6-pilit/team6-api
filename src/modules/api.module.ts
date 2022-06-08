@@ -1,10 +1,11 @@
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AlertModule } from './alert';
+import CatchException from './CatchException';
 
-import { AllExceptionFilter } from './http-exception.filter.ts';
 import { MessageQueueModule } from './message_queue';
 import { PillManageModule } from './pill_manage/pill_manage.module';
 import { PushModule } from './push';
@@ -41,7 +42,12 @@ import { UserManageModule } from './user_manage';
 		UserManageModule,
 		AlertModule,
 		PushModule,
-		AllExceptionFilter,
+	],
+	providers: [
+		{
+			provide: APP_FILTER,
+			useClass: CatchException,
+		},
 	],
 })
 export class ApiModule {}
