@@ -1,4 +1,3 @@
-import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { RepositoryModule } from '@modules/repo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -9,19 +8,19 @@ import { UserManageController } from './user_manage.controller';
 import { UserManageService } from './user_manage.service';
 
 @Module({
-  imports:[
-    ConfigModule.forRoot(),
-    PassportModule.register({defaultStrategy:'jwt'}),
-    JwtModule.register({
-      secret:process.env.JWT,
-      signOptions:{
-        expiresIn:60000000000*600000000000,
-      }
-    }),
-    RepositoryModule,AllExceptionFilter
-  ],
-  controllers: [UserManageController],
-  providers: [UserManageService,JwtStrategy],
-  exports: [UserManageService,PassportModule],
+	imports: [
+		ConfigModule.forRoot(),
+		PassportModule.register({ defaultStrategy: 'jwt' }),
+		JwtModule.register({
+			secret: process.env.JWT,
+			signOptions: {
+				expiresIn: 60000000000 * 600000000000,
+			},
+		}),
+		RepositoryModule,
+	],
+	controllers: [UserManageController],
+	providers: [UserManageService, JwtStrategy],
+	exports: [UserManageService, PassportModule],
 })
 export class UserManageModule {}
