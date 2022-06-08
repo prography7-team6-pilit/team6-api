@@ -22,10 +22,7 @@ import { PillManageService } from './pill_manage.service';
 import { EatResponseDto } from './dto/eat.response.post.dto';
 import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
 import { EatResponseMonthDto } from './dto/eat.response.month.dto';
-import { EatResponseMonthUnitDto } from './dto/eat.response.month.unit.dto';
-import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 
-@UseFilters(AllExceptionFilter)
 @Controller({
 	version: '1',
 	path: 'pills',
@@ -50,17 +47,13 @@ export class PillManageController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		try {
-			const userId = req!.user!.userId;
-			const getMonthData = await this.pillService.getMonthPill(
-				userId,
-				year,
-				month,
-			);
-			return res.json(getMonthData);
-		} catch (err) {
-			console.log(err);
-		}
+		const userId = req!.user!.userId;
+		const getMonthData = await this.pillService.getMonthPill(
+			userId,
+			year,
+			month,
+		);
+		return res.json(getMonthData);
 	}
 
 	@ApiBearerAuth('access-token')

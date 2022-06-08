@@ -22,7 +22,7 @@ export class MessageQueueService {
 		let result: JobResponseGetDto = { alerts: [] };
 		const todayJobTimes = await this.repo.getJobByDay(userId, year, month, day);
 		for (const element of todayJobTimes) {
-			/* 아래 코드 실행시 시간배열, 요일 모두 배열로 출력
+			// 아래 코드 실행시 시간배열, 요일 모두 배열로 출력
 			const alertIndex = result.alerts.findIndex(function (item, i) {
 				return item.alertId === element.pillId;
 			});
@@ -33,7 +33,7 @@ export class MessageQueueService {
 				}
 				alert.alertTime.push(element.time);
 				continue;
-			}*/
+			}
 			const getWeek = await this.repo.getWeekByalertId(element.pillId);
 			const todayJobInfos = await this.repo.getInofoByPillId(element.pillId);
 			if (!todayJobInfos) {
@@ -41,7 +41,7 @@ export class MessageQueueService {
 			}
 			const eatInfo = await this.repo.getTakeOrNot(
 				userId,
-				element.alertTimeId,
+				element.pillId,
 				year,
 				month,
 				day,
@@ -53,7 +53,6 @@ export class MessageQueueService {
 				isPush: todayJobInfos.isPush,
 				pillName: todayJobInfos.pillName,
 				dosage: todayJobInfos.dosage,
-				alertTimeId: element.alertTimeId,
 				eatResult: false,
 			};
 			if (eatInfo) {
@@ -130,7 +129,11 @@ export class MessageQueueService {
 		alertId: number,
 	): Promise<JobResponseDto> {
 		const job = await this.repo.getbullidByalertId(alertId);
-		await this.alertService.removeOne(alertId, job.alertId, job.firebasetoken);
+		await this.alertService.removeOne(
+			job.bullId,
+			job.alertId,
+			job.firebasetoken,
+		);
 		const data = await this.repo.softDelJob(userId, alertId);
 		if (data) {
 			return { result: true };

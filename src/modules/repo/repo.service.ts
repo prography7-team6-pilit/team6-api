@@ -1,4 +1,3 @@
-import { AllExceptionFilter } from '@modules/http-exception.filter.ts';
 import { Week } from '@modules/message_queue/dto/enums/week.enum';
 import { ConsoleLogger, Injectable, UseFilters } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,7 +15,6 @@ import { Eat } from './entity/eat.entity';
 import { Job } from './entity/job.entity';
 import { User } from './entity/user.entity';
 
-@UseFilters(AllExceptionFilter)
 @Injectable()
 export class RepositoryService {
 	constructor(
@@ -56,14 +54,14 @@ export class RepositoryService {
 	}
 	async getTakeOrNot(
 		userId: number,
-		alertTimeId: number,
+		alertId: number,
 		year: number,
 		month: number,
 		day: number,
 	) {
 		const takeLogs = await getRepository(Eat).findOne({
 			userId: userId,
-			alertTimeId: alertTimeId,
+			alertId: alertId,
 			eatDate: `${year}-${month}-${day}`,
 		});
 		return takeLogs;
@@ -198,7 +196,6 @@ export class RepositoryService {
 			})
 			.getMany();
 
-		console.log(firstDay, lastDay);
 		return statusList;
 	}
 
@@ -218,11 +215,11 @@ export class RepositoryService {
 		return result;
 	}
 
-	async isTaked(alertTimeId: number): Promise<Eat | undefined> {
+	async isTaked(alertId: number): Promise<Eat | undefined> {
 		const now_data = new Date(new Date().toLocaleDateString());
 		const logCheck = await getRepository(Eat)
 			.createQueryBuilder()
-			.andWhere('alertTimeId=:alertTimeId', { alertTimeId: alertTimeId })
+			.andWhere('alertId=:alertId', { alertId: alertId })
 			.andWhere('eatDate= :now_data', {
 				now_data: now_data,
 			})
