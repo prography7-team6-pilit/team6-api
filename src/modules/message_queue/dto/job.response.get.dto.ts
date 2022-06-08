@@ -10,7 +10,7 @@ export class JobResponseGetDto {
         {
           "alertId": 178,
           "alertTime": [
-            "12:11"
+            "12:30","13:00","23:30"
           ],
           "alertWeek": [
             "Mon","Fri"
@@ -24,7 +24,7 @@ export class JobResponseGetDto {
         {
           "alertId": 179,
           "alertTime": [
-            "17:01"
+            "17:00","20:00","23:30"
           ],
           "alertWeek": [
             "Mon"
@@ -38,7 +38,7 @@ export class JobResponseGetDto {
         {
           "alertId": 180,
           "alertTime": [
-            "19:24"
+            "02:30","05:00","13:00"
           ],
           "alertWeek": [
             "Mon","Thu"
