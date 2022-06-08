@@ -3,10 +3,10 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class EatRequestDto {
 	@ApiProperty({
-		description: 'alertTimeId',
+		description: 'alertId',
 		example: 1,
 	})
 	@IsNotEmpty()
 	@IsNumber()
-	readonly alertTimeId: number;
+	readonly alertId: number;
 }

@@ -32,12 +32,12 @@ export class PillManageService {
 		requestDto: EatRequestDto,
 		userId: number,
 	): Promise<JobResponsePostDto | undefined> {
-		const isTaked = await this.repo.isTaked(requestDto.alertTimeId);
+		const isTaked = await this.repo.isTaked(requestDto.alertId);
 		if (!isTaked) {
 			const eat: Eat = {
 				eatId: 0,
 				userId: userId,
-				alertTimeId: requestDto.alertTimeId,
+				alertId: requestDto.alertId,
 				eatDate: new Date(new Date().toLocaleDateString()),
 			};
 			await this.repo.addPill(eat);

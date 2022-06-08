@@ -1,7 +1,7 @@
 export enum Week {
 	Sun = 'Sun',
 	Mon = 'Mon',
-	Tue = 'Thu',
+	Tue = 'Tue',
 	Wed = 'Wed',
 	Thu = 'Thu',
 	Fri = 'Fri',
