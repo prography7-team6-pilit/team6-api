@@ -12,6 +12,10 @@ export class PushService {
 	constructor(private http: HttpService) {}
 	async push({ firebaseToken, title, body }: PushParams): Promise<void> {
 		const payload = {
+			notification: {
+				title: title,
+				body: body,
+			},
 			data: {
 				title: title,
 				body: body,
