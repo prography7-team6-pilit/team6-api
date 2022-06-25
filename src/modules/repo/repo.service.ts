@@ -168,12 +168,21 @@ export class RepositoryService {
 	}
 	//--------------------------------------------------------------
 
-	async getNickname(uuid: string): Promise<User | undefined> {
+	async getNickname(uuid: string) {
 		const nickname = await this.userRepository.findOne({ uuid: uuid });
 		return nickname;
 	}
 
-	async setNickname(userEntity: User): Promise<User> {
+	async setNickname(
+		uuid: string,
+		nickname: string,
+		firebasetoken: string,
+	): Promise<User> {
+		const userEntity = this.userRepository.create({
+			uuid,
+			nickname,
+			firebasetoken,
+		});
 		const checkDuplicateUUid = await this.userRepository.findOne({
 			uuid: userEntity.uuid,
 		});

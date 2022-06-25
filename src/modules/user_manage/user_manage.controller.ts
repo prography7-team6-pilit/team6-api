@@ -20,7 +20,6 @@ import { UserRequestDto } from './dto/user.request.dto';
 import { UserResponseDto } from './dto/user.reponse.dto';
 import { UserManageService } from './user_manage.service';
 import { UserRequestGetDto } from './dto/user.response.get.dto';
-import { ErrorDto } from '@modules/ErrorDto';
 
 @Controller({
 	version: '1',
@@ -38,6 +37,10 @@ export class UserManageController {
 		description: '인증 성공',
 		type: UserResponseDto,
 	})
+	@ApiForbiddenResponse({
+		status: 403,
+		description: '잘못된 인증입니다',
+	})
 	@ApiQuery({
 		name: 'uuid',
 		required: true,
@@ -47,13 +50,14 @@ export class UserManageController {
 	@Get('/login')
 	async getUser(@Query() requestData: UserRequestGetDto, @Res() res: Response) {
 		const accessToken = await this.userService.signIn(requestData.uuid);
-		if (accessToken) {
-			const userResponse: UserResponseDto = {
-				accessToken: accessToken,
-				result: true,
-			};
-			return res.header('accessToken', accessToken).json(userResponse);
+		if (!accessToken) {
+			throw new HttpException('잘못된 인증입니다', 403);
 		}
+		const userResponse: UserResponseDto = {
+			accessToken: accessToken,
+			result: true,
+		};
+		return res.header('accessToken', accessToken).json(userResponse);
 	}
 
 	@ApiOperation({ summary: '닉네임 등록 (AccessToken 헤더로 반환)' })

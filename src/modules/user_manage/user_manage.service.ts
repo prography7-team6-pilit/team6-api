@@ -11,23 +11,21 @@ export class UserManageService {
 		private readonly repo: RepositoryService,
 	) {}
 
-	async signIn(uuid: string): Promise<string> {
+	async signIn(uuid: string) {
 		const result = await this.repo.getNickname(uuid);
-		if (result) {
-			const payload = { ...result };
-			const accessToken = this.jwtService.sign(payload);
-			return accessToken;
+		if (!result) {
+			return;
 		}
-		throw new HttpException('잘못된 UUID입니다', 403);
+		const payload = { ...result };
+		const accessToken = this.jwtService.sign(payload);
+		return accessToken;
 	}
 	async signUp(userDto: UserRequestDto): Promise<string> {
-		const userEntity: User = {
-			userId: 0,
-			uuid: userDto.uuid,
-			nickname: userDto.nickname,
-			firebasetoken: userDto.firebasetoken,
-		};
-		const result = await this.repo.setNickname(userEntity);
+		const result = await this.repo.setNickname(
+			userDto.uuid,
+			userDto.nickname,
+			userDto.firebasetoken,
+		);
 		const payload = { ...result };
 		const accessToken = await this.jwtService.sign(payload);
 		return accessToken;
