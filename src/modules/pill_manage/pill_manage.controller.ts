@@ -36,7 +36,7 @@ export class PillManageController {
 	@ApiOperation({
 		summary: '월별 섭취 정보(캘린더)',
 		description:
-			'state는 총 두가지로 표현되며 [ 미완료(0), 완료(1) ] 데이터가 없는 날은 날짜가 나오지 않습니다.',
+			'state는 총 두가지로 표현되며 [ 미완료(1), 완료(2) ] 데이터가 없는 날은 날짜가 나오지 않습니다. 복용여부가 없으면 값이 반환되지 않습니다.',
 	})
 	@ApiCreatedResponse({ description: '성공', type: EatResponseMonthDto }) //type 수정하기
 	@UseGuards(JwtAuthGuard)
