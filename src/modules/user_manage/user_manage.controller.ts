@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpException,
 	Post,
 	Query,
 	Res,
@@ -16,10 +17,10 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { UserRequestDto } from './dto/user.request.dto';
-import { UserResponseErrorDto } from './dto/user.error.dto';
 import { UserResponseDto } from './dto/user.reponse.dto';
 import { UserManageService } from './user_manage.service';
 import { UserRequestGetDto } from './dto/user.response.get.dto';
+import { ErrorDto } from '@modules/ErrorDto';
 
 @Controller({
 	version: '1',
@@ -37,11 +38,6 @@ export class UserManageController {
 		description: '인증 성공',
 		type: UserResponseDto,
 	})
-	@ApiForbiddenResponse({
-		status: 401,
-		description: '인증 실패',
-		type: UserResponseErrorDto,
-	})
 	@ApiQuery({
 		name: 'uuid',
 		required: true,
@@ -57,23 +53,17 @@ export class UserManageController {
 				result: true,
 			};
 			return res.header('accessToken', accessToken).json(userResponse);
-		} else {
-			const userResponse: UserResponseErrorDto = {
-				result: false,
-				error: 'Unauthorized',
-			};
-			return res.status(401).json(userResponse);
 		}
 	}
 
 	@ApiOperation({ summary: '닉네임 등록 (AccessToken 헤더로 반환)' })
 	@ApiCreatedResponse({
-		description: '닉네임 등록 성공',
+		description: '가입 성공',
 		type: UserResponseDto,
 	})
 	@ApiForbiddenResponse({
-		description: '존재하는 uuid',
-		type: UserResponseErrorDto,
+		status: 403,
+		description: '존재하는 UUID 입니다.',
 	})
 	@Post('/join')
 	async setUser(@Body() userDto: UserRequestDto, @Res() res: Response) {
@@ -84,12 +74,6 @@ export class UserManageController {
 				result: true,
 			};
 			return res.header('accessToken', accessToken).json(userResponse);
-		} else {
-			const userResponse: UserResponseErrorDto = {
-				result: false,
-				error: 'The user already exists.',
-			};
-			return res.status(401).json(userResponse);
 		}
 	}
 }

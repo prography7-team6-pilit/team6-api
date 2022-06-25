@@ -1,5 +1,10 @@
 import { Week } from '@modules/message_queue/dto/enums/week.enum';
-import { ConsoleLogger, Injectable, UseFilters } from '@nestjs/common';
+import {
+	ConsoleLogger,
+	HttpException,
+	Injectable,
+	UseFilters,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { query } from 'express';
 import {
@@ -169,10 +174,15 @@ export class RepositoryService {
 	}
 
 	async setNickname(userEntity: User): Promise<User> {
+		const checkDuplicateUUid = await this.userRepository.findOne({
+			uuid: userEntity.uuid,
+		});
+		if (checkDuplicateUUid) {
+			throw new HttpException('존재하는 UUID 입니다.', 403);
+		}
 		const result = await this.userRepository.save(userEntity);
 		return result;
 	}
-	//--------------------------------------------------------------
 
 	async getMonthData(userId: number, year: number, month: number) {
 		// TODO: day-taking-log 뽑아서 리턴
