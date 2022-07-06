@@ -5,7 +5,7 @@ import {
 	HttpException,
 } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { ErrorDto } from './ErrorDto';
+import { ErrorDto } from './error.dto';
 
 @Catch()
 export default class CatchException implements ExceptionFilter {
