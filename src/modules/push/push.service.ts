@@ -22,7 +22,7 @@ export class PushService {
 			},
 			to: firebaseToken,
 		};
-		const response = await this.sendFcmMessage(payload);
+		await this.sendFcmMessage(payload);
 	}
 
 	private async sendFcmMessage(fcmMessage: any) {

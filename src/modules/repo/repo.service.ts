@@ -96,7 +96,7 @@ export class RepositoryService {
 		userId: number,
 		dosage: number,
 	): Promise<{ alertId: number }> {
-		const data = await this.jobRepository.create({
+		const data = this.jobRepository.create({
 			isPush,
 			bullId,
 			firebasetoken,
