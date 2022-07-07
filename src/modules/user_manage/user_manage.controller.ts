@@ -30,7 +30,7 @@ export class UserManageController {
 	constructor(private readonly userService: UserManageService) {}
 
 	@ApiOperation({
-		summary: '사용중단예정 - 서비스 접근 (AccessToken 헤더로 반환)',
+		summary: '계정 불러오기',
 	})
 	@ApiCreatedResponse({
 		status: 201,
@@ -60,7 +60,7 @@ export class UserManageController {
 		return res.header('accessToken', accessToken).json(userResponse);
 	}
 
-	@ApiOperation({ summary: '닉네임 등록 (AccessToken 헤더로 반환)' })
+	@ApiOperation({ summary: '계정 등록' })
 	@ApiCreatedResponse({
 		description: '가입 성공',
 		type: UserResponseDto,
