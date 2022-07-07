@@ -88,9 +88,8 @@ export class RepositoryService {
 		return result;
 	}
 
-	async repo_saveJobInfo(
+	async saveJob(
 		isPush: boolean,
-		bullId: string,
 		firebasetoken: string,
 		pillName: string,
 		userId: number,
@@ -98,7 +97,6 @@ export class RepositoryService {
 	): Promise<{ alertId: number }> {
 		const data = this.jobRepository.create({
 			isPush,
-			bullId,
 			firebasetoken,
 			pillName,
 			userId,
@@ -113,12 +111,14 @@ export class RepositoryService {
 		time: string,
 		userId: number,
 		pillId: number,
+		bullId: string,
 	): Promise<AlertTime> {
 		const data = await this.alertTimeRepository.create({
 			week,
 			time,
 			userId,
 			pillId,
+			bullId,
 		});
 		const result = await this.alertTimeRepository.save(data);
 		return result;
@@ -133,6 +133,10 @@ export class RepositoryService {
 			.execute();
 	}
 
+	async deleteAlertTime(pillId: number) {
+		const result = await this.alertTimeRepository.delete({ pillId });
+		return result;
+	}
 	async softDelJob(userId: number, alertId: number): Promise<DeleteResult> {
 		const job = await getConnection()
 			.getRepository(Job)
@@ -277,6 +281,11 @@ export class RepositoryService {
 			userId,
 		});
 		return result;
+	}
+
+	async getAlerts(pillId: number) {
+		const AlertTimes = await this.alertTimeRepository.find({ pillId });
+		return AlertTimes;
 	}
 	async dayToweek(day: number): Promise<Week> {
 		let result: Week = Week.Sun;
