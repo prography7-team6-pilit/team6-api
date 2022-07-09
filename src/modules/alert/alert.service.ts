@@ -2,10 +2,10 @@ import { Week } from '@modules/message_queue/dto/enums/week.enum';
 import { AlertTime } from '@modules/repo/entity/alert-time.entity';
 import { Job } from '@modules/repo/entity/job.entity';
 import { InjectQueue } from '@nestjs/bull';
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Bull, { Queue } from 'bull';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 
 import { AlertDto } from '../../core/types';
 
@@ -39,16 +39,18 @@ export class AlertService {
 		userId,
 		pillId,
 	}: CreateAlertParams): Promise<{ alertId: string }> {
-		const alertId = await this.getAlertIdByAlertTime(weekday, time, userId);
-		let pills = [{ name: pillName, pillId }];
-		if (alertId) {
-			this.alertQueue.getJob(alertId).then((job) => {
-				job?.update({
+		let pills = [{ name: pillName, pillId: pillId }];
+		const bullId = await this.getBullIdByAlertTime(weekday, time, userId);
+		if (bullId) {
+			await this.alertQueue.getJob(bullId).then(async (job) => {
+				let pillData = job!.data.pills;
+				pillData.push({ name: pillName, pillId: pillId });
+				await job!.update({
 					firebaseToken,
-					pills: [...pills, ...job.data.pills],
+					pills: [...pillData],
 				});
 			});
-			return { alertId: `${alertId}` };
+			return { alertId: `${bullId}` };
 		}
 		const alert = await this.alertQueue.add(
 			{
@@ -62,16 +64,17 @@ export class AlertService {
 		return { alertId: `${alert.id}` };
 	}
 
-	async removeOne(alertId: Bull.JobId, pillId: number, firebaseToken: string) {
-		this.alertQueue.getJob(alertId).then(async (job) => {
+	async removeOne(bullId: Bull.JobId, pillId: number) {
+		this.alertQueue.getJob(bullId).then(async (job) => {
 			const pillData = job!.data.pills;
+			const firebaseToken = job!.data.firebaseToken;
 			const idx = pillData.findIndex(function (item) {
 				return item.pillId === pillId;
 			});
 			if (idx > -1) {
 				pillData.splice(idx, 1);
 			}
-			if (pillData == null) {
+			if (pillData.length == 0) {
 				await job!.remove();
 			} else {
 				await job!.update({
@@ -82,11 +85,11 @@ export class AlertService {
 		});
 	}
 
-	private async getAlertIdByAlertTime(
+	private async getBullIdByAlertTime(
 		weekday: Week,
 		time: string,
 		userId: number,
-	): Promise<Bull.JobId | void> {
+	) {
 		const alertTime = await this.alertTimeRepository.findOne({
 			week: weekday,
 			time,
@@ -95,19 +98,11 @@ export class AlertService {
 		if (!alertTime) {
 			return;
 		}
-		const pill = await this.pillRepository.findOne({
-			alertId: alertTime.pillId,
-			userId,
-		});
-		if (!pill) {
-			return;
-		}
-		return pill.bullId;
+		return alertTime.bullId;
 	}
 
 	private timeToCron(week: Week, time: string): string {
 		const hourMinute = time.split(':');
-
 		const cron = `0 ${hourMinute[1]} ${hourMinute[0]} * * ${week}`;
 		return cron;
 	}

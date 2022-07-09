@@ -16,9 +16,11 @@ import {
 import {
 	ApiBearerAuth,
 	ApiCreatedResponse,
+	ApiForbiddenResponse,
 	ApiOperation,
 	ApiParam,
 	ApiTags,
+	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { JobRequestPostDto } from './dto/job.request.post.dto';
@@ -40,8 +42,9 @@ export class MessageQueueController {
 	constructor(private msgq: MessageQueueService) {}
 
 	@ApiBearerAuth('access-token')
-	@ApiOperation({ summary: '오늘의 알람 조회 (메인페이지,캘린더) 구현 완료' })
+	@ApiOperation({ summary: '알람 조회' })
 	@ApiCreatedResponse({ description: '성공', type: JobResponseGetDto })
+	@ApiUnauthorizedResponse({ description: 'Unathorized(사용자 인증실패)' })
 	@UseGuards(JwtAuthGuard)
 	@Get('/')
 	async getAlert(
@@ -60,8 +63,9 @@ export class MessageQueueController {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiOperation({ summary: '알람 등록 (알람추가페이지) 구현 완료' })
+	@ApiOperation({ summary: '알람 등록' })
 	@ApiCreatedResponse({ description: '성공', type: JobResponseDto })
+	@ApiUnauthorizedResponse({ description: 'Unathorized(사용자 인증실패)' })
 	@UseGuards(JwtAuthGuard)
 	@Post('/')
 	async postAlert(
@@ -88,8 +92,9 @@ export class MessageQueueController {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiOperation({ summary: '알람 수정 (수정페이지)' })
+	@ApiOperation({ summary: '알람 수정' })
 	@ApiCreatedResponse({ description: '성공', type: JobResponseDto })
+	@ApiUnauthorizedResponse({ description: 'Unathorized(사용자 인증실패)' })
 	@UseGuards(JwtAuthGuard)
 	@Put('/:alertId')
 	async putAlert(
@@ -124,9 +129,10 @@ export class MessageQueueController {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiOperation({ summary: '알람 제거 구현완료' })
+	@ApiOperation({ summary: '알람 제거' })
 	@ApiCreatedResponse({ description: '성공', type: JobResponseDto })
 	@ApiParam({ name: 'alertId', required: true, example: '1' })
+	@ApiUnauthorizedResponse({ description: 'Unathorized(사용자 인증실패)' })
 	@UseGuards(JwtAuthGuard)
 	@Delete('/:alertId')
 	async removeMsg(

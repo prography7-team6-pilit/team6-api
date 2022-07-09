@@ -1,5 +1,10 @@
 import { Week } from '@modules/message_queue/dto/enums/week.enum';
-import { ConsoleLogger, Injectable, UseFilters } from '@nestjs/common';
+import {
+	ConsoleLogger,
+	HttpException,
+	Injectable,
+	UseFilters,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { query } from 'express';
 import {
@@ -83,17 +88,15 @@ export class RepositoryService {
 		return result;
 	}
 
-	async repo_saveJobInfo(
+	async saveJob(
 		isPush: boolean,
-		bullId: string,
 		firebasetoken: string,
 		pillName: string,
 		userId: number,
 		dosage: number,
 	): Promise<{ alertId: number }> {
-		const data = await this.jobRepository.create({
+		const data = this.jobRepository.create({
 			isPush,
-			bullId,
 			firebasetoken,
 			pillName,
 			userId,
@@ -108,12 +111,14 @@ export class RepositoryService {
 		time: string,
 		userId: number,
 		pillId: number,
+		bullId: string,
 	): Promise<AlertTime> {
 		const data = await this.alertTimeRepository.create({
 			week,
 			time,
 			userId,
 			pillId,
+			bullId,
 		});
 		const result = await this.alertTimeRepository.save(data);
 		return result;
@@ -128,6 +133,10 @@ export class RepositoryService {
 			.execute();
 	}
 
+	async deleteAlertTime(pillId: number) {
+		const result = await this.alertTimeRepository.delete({ pillId });
+		return result;
+	}
 	async softDelJob(userId: number, alertId: number): Promise<DeleteResult> {
 		const job = await getConnection()
 			.getRepository(Job)
@@ -163,16 +172,30 @@ export class RepositoryService {
 	}
 	//--------------------------------------------------------------
 
-	async getNickname(uuid: string): Promise<User | undefined> {
+	async getNickname(uuid: string) {
 		const nickname = await this.userRepository.findOne({ uuid: uuid });
 		return nickname;
 	}
 
-	async setNickname(userEntity: User): Promise<User> {
+	async setNickname(
+		uuid: string,
+		nickname: string,
+		firebasetoken: string,
+	): Promise<User> {
+		const userEntity = this.userRepository.create({
+			uuid,
+			nickname,
+			firebasetoken,
+		});
+		const checkDuplicateUUid = await this.userRepository.findOne({
+			uuid: userEntity.uuid,
+		});
+		if (checkDuplicateUUid) {
+			throw new HttpException('존재하는 UUID 입니다.', 403);
+		}
 		const result = await this.userRepository.save(userEntity);
 		return result;
 	}
-	//--------------------------------------------------------------
 
 	async getMonthData(userId: number, year: number, month: number) {
 		// TODO: day-taking-log 뽑아서 리턴
@@ -258,6 +281,11 @@ export class RepositoryService {
 			userId,
 		});
 		return result;
+	}
+
+	async getAlerts(pillId: number) {
+		const AlertTimes = await this.alertTimeRepository.find({ pillId });
+		return AlertTimes;
 	}
 	async dayToweek(day: number): Promise<Week> {
 		let result: Week = Week.Sun;

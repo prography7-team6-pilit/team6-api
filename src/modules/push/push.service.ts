@@ -12,13 +12,18 @@ export class PushService {
 	constructor(private http: HttpService) {}
 	async push({ firebaseToken, title, body }: PushParams): Promise<void> {
 		const payload = {
+			notification: {
+				title: title,
+				body: body,
+			},
 			data: {
 				title: title,
 				body: body,
 			},
 			to: firebaseToken,
 		};
-		const response = await this.sendFcmMessage(payload);
+		console.log('메세지전송', payload);
+		await this.sendFcmMessage(payload);
 	}
 
 	private async sendFcmMessage(fcmMessage: any) {

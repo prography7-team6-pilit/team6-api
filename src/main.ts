@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { DefaultExceptionFilter } from './core/exception-filters';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -37,6 +38,7 @@ async function bootstrap() {
 		type: VersioningType.URI,
 		defaultVersion: VERSION_NEUTRAL,
 	});
+	app.useGlobalFilters(new DefaultExceptionFilter());
 
 	setupSwagger(app);
 
@@ -48,3 +50,6 @@ async function bootstrap() {
 	});
 }
 bootstrap();
+
+//알림 수정과정 리펙토링(alertId 변경안되게)
+//statusCode 처리하기

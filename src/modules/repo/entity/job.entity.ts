@@ -1,11 +1,4 @@
-import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToMany,
-	PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Job')
 export class Job {
@@ -20,6 +13,7 @@ export class Job {
 	@Column({
 		type: 'text',
 		name: 'bullId',
+		nullable: true,
 	})
 	bullId: string;
 
