@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { DefaultExceptionFilter } from './core/exception-filters';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -37,6 +38,7 @@ async function bootstrap() {
 		type: VersioningType.URI,
 		defaultVersion: VERSION_NEUTRAL,
 	});
+	app.useGlobalFilters(new DefaultExceptionFilter());
 
 	setupSwagger(app);
 
