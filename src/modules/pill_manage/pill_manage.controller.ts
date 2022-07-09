@@ -31,7 +31,6 @@ import { EatResponseMonthDto } from './dto/eat.response.month.dto';
 export class PillManageController {
 	constructor(private readonly pillService: PillManageService) {}
 
-	//Eat 기반으로 탐색
 	@ApiBearerAuth('access-token')
 	@ApiOperation({
 		summary: '월별 섭취 정보(캘린더)',
