@@ -29,4 +29,11 @@ export class AlertTime {
 		name: 'pillId',
 	})
 	pillId: number;
+
+	@Column({
+		type: 'text',
+		name: 'bullId',
+		nullable: true,
+	})
+	bullId: string;
 }

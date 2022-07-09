@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpException,
 	Post,
 	Query,
 	Res,
@@ -16,7 +17,6 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { UserRequestDto } from './dto/user.request.dto';
-import { UserResponseErrorDto } from './dto/user.error.dto';
 import { UserResponseDto } from './dto/user.reponse.dto';
 import { UserManageService } from './user_manage.service';
 import { UserRequestGetDto } from './dto/user.response.get.dto';
@@ -30,7 +30,7 @@ export class UserManageController {
 	constructor(private readonly userService: UserManageService) {}
 
 	@ApiOperation({
-		summary: '사용중단예정 - 서비스 접근 (AccessToken 헤더로 반환)',
+		summary: '계정 불러오기',
 	})
 	@ApiCreatedResponse({
 		status: 201,
@@ -38,9 +38,8 @@ export class UserManageController {
 		type: UserResponseDto,
 	})
 	@ApiForbiddenResponse({
-		status: 401,
-		description: '인증 실패',
-		type: UserResponseErrorDto,
+		status: 403,
+		description: '잘못된 인증입니다',
 	})
 	@ApiQuery({
 		name: 'uuid',
@@ -51,29 +50,24 @@ export class UserManageController {
 	@Get('/login')
 	async getUser(@Query() requestData: UserRequestGetDto, @Res() res: Response) {
 		const accessToken = await this.userService.signIn(requestData.uuid);
-		if (accessToken) {
-			const userResponse: UserResponseDto = {
-				accessToken: accessToken,
-				result: true,
-			};
-			return res.header('accessToken', accessToken).json(userResponse);
-		} else {
-			const userResponse: UserResponseErrorDto = {
-				result: false,
-				error: 'Unauthorized',
-			};
-			return res.status(401).json(userResponse);
+		if (!accessToken) {
+			throw new HttpException('잘못된 인증입니다', 403);
 		}
+		const userResponse: UserResponseDto = {
+			accessToken: accessToken,
+			result: true,
+		};
+		return res.header('accessToken', accessToken).json(userResponse);
 	}
 
-	@ApiOperation({ summary: '닉네임 등록 (AccessToken 헤더로 반환)' })
+	@ApiOperation({ summary: '계정 등록' })
 	@ApiCreatedResponse({
-		description: '닉네임 등록 성공',
+		description: '가입 성공',
 		type: UserResponseDto,
 	})
 	@ApiForbiddenResponse({
-		description: '존재하는 uuid',
-		type: UserResponseErrorDto,
+		status: 403,
+		description: '존재하는 UUID 입니다.',
 	})
 	@Post('/join')
 	async setUser(@Body() userDto: UserRequestDto, @Res() res: Response) {
@@ -84,12 +78,6 @@ export class UserManageController {
 				result: true,
 			};
 			return res.header('accessToken', accessToken).json(userResponse);
-		} else {
-			const userResponse: UserResponseErrorDto = {
-				result: false,
-				error: 'The user already exists.',
-			};
-			return res.status(401).json(userResponse);
 		}
 	}
 }

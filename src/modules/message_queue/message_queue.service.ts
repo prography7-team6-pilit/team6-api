@@ -22,7 +22,6 @@ export class MessageQueueService {
 		let result: JobResponseGetDto = { alerts: [] };
 		const todayJobTimes = await this.repo.getJobByDay(userId, year, month, day);
 		for (const element of todayJobTimes) {
-			// 아래 코드 실행시 시간배열, 요일 모두 배열로 출력
 			const alertIndex = result.alerts.findIndex(function (item, i) {
 				return item.alertId === element.pillId;
 			});
@@ -72,9 +71,8 @@ export class MessageQueueService {
 		firebasetoken: string,
 		dosage: number,
 	): Promise<Boolean> {
-		const infoData = await this.repo.repo_saveJobInfo(
+		const infoData = await this.repo.saveJob(
 			isPush,
-			'0',
 			firebasetoken,
 			pillName,
 			userId,
@@ -90,18 +88,14 @@ export class MessageQueueService {
 					userId: userId,
 					pillId: infoData.alertId,
 				};
-				if (isPush === true) {
-					const bullId = await this.alertService.create(createAlert);
-					await this.repo.repo_updateJobAlertId(
-						infoData.alertId,
-						bullId.alertId,
-					);
-				}
-				const saveTime = await this.repo.repo_saveJobTime(
+				const bullId = await this.alertService.create(createAlert);
+				await this.repo.repo_updateJobAlertId(infoData.alertId, bullId.alertId);
+				await this.repo.repo_saveJobTime(
 					week,
 					time,
 					userId,
 					infoData.alertId,
+					bullId.alertId,
 				);
 			}
 		}
@@ -128,12 +122,11 @@ export class MessageQueueService {
 		userId: number,
 		alertId: number,
 	): Promise<JobResponseDto> {
-		const job = await this.repo.getbullidByalertId(alertId);
-		await this.alertService.removeOne(
-			job.bullId,
-			job.alertId,
-			job.firebasetoken,
-		);
+		const alertTimes = await this.repo.getAlerts(alertId);
+		for (const alertTime of alertTimes) {
+			await this.alertService.removeOne(alertTime.bullId, alertTime.pillId);
+		}
+		await this.repo.deleteAlertTime(alertId);
 		const data = await this.repo.softDelJob(userId, alertId);
 		if (data) {
 			return { result: true };

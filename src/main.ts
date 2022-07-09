@@ -48,3 +48,6 @@ async function bootstrap() {
 	});
 }
 bootstrap();
+
+//알림 수정과정 리펙토링(alertId 변경안되게)
+//statusCode 처리하기
