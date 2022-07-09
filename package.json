@@ -1,10 +1,12 @@
 {
-	"name": "nestjs-server-template",
+	"name": "team6-api",
 	"version": "0.0.1",
-	"description": "",
-	"author": "",
 	"private": true,
 	"license": "UNLICENSED",
+	"engines": {
+		"node": ">=16",
+		"pnpm": "6.x"
+	},
 	"scripts": {
 		"prebuild": "rimraf dist",
 		"build": "nest build",
