@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable, Logger } from '@nestjs/common';
 
 interface PushParams {
 	firebaseToken: string;
@@ -9,6 +9,7 @@ interface PushParams {
 
 @Injectable()
 export class PushService {
+	private logger = new ConsoleLogger();
 	constructor(private http: HttpService) {}
 	async push({ firebaseToken, title, body }: PushParams): Promise<void> {
 		const payload = {
@@ -22,6 +23,7 @@ export class PushService {
 			},
 			to: firebaseToken,
 		};
+		this.logger.log('메세지전송', payload);
 		console.log('메세지전송', payload);
 		await this.sendFcmMessage(payload);
 	}
