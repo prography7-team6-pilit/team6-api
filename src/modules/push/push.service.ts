@@ -22,6 +22,7 @@ export class PushService {
 			},
 			to: firebaseToken,
 		};
+		console.log('메세지전송', payload);
 		await this.sendFcmMessage(payload);
 	}
 

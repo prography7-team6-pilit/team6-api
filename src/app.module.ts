@@ -1,7 +1,7 @@
 import { HealthCheckModule } from '@kiwi-lib/nestjs';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
+import { AppLoggerMiddleware } from './log.interceptor';
 import { ApiModule } from './modules';
 
 @Module({
@@ -14,5 +14,10 @@ import { ApiModule } from './modules';
 		HealthCheckModule,
 		ApiModule,
 	],
+	providers: [AppLoggerMiddleware],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+	configure(consumer: MiddlewareConsumer): void {
+		consumer.apply(AppLoggerMiddleware).forRoutes('*');
+	}
+}

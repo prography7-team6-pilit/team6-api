@@ -10,6 +10,7 @@ export class MessageQueueConsumer {
 
 	@Process()
 	async handleTranscode(job: Job<AlertDto>) {
+		//todo : isPushed 처리하기
 		const { firebaseToken, pills } = job.data;
 		const title = `약 먹을 시간입니다.`;
 		let body = `복용해야할 약 목록은`;
@@ -22,6 +23,7 @@ export class MessageQueueConsumer {
 			}
 		});
 		body = `${body} 입니다`;
+		console.log(body);
 		// finished TODO: pills로 title, body 만들기
 		await this.pushService.push({
 			firebaseToken,

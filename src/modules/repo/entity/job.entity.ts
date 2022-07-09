@@ -13,6 +13,7 @@ export class Job {
 	@Column({
 		type: 'text',
 		name: 'bullId',
+		nullable: true,
 	})
 	bullId: string;
 
