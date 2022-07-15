@@ -6,16 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AlertModule } from './alert';
 import CatchException from './CatchException';
 
-import { MessageQueueModule } from './message_queue';
-import { PillManageModule } from './pill_manage/pill_manage.module';
+import { AlertTime } from '../entity/alert-time.entity';
+import { DayTakingLog } from '../entity/day-taking-log.entity';
+import { Eat } from '../entity/eat.entity';
+import { Job } from '../entity/job.entity';
+import { User } from '../entity/user.entity';
+import { PillModule } from './pill/pill.module';
 import { PushModule } from './push';
-import { AlertTime } from './repo/entity/alert-time.entity';
-import { DayTakingLog } from './repo/entity/day-taking-log.entity';
-import { Eat } from './repo/entity/eat.entity';
-import { Job } from './repo/entity/job.entity';
-import { User } from './repo/entity/user.entity';
-import { RepositoryModule } from './repo/repo.module';
-import { UserManageModule } from './user_manage';
+import { UserModule } from './user';
 
 @Module({
 	imports: [
@@ -36,11 +34,9 @@ import { UserManageModule } from './user_manage';
 				port: 6379,
 			},
 		}),
-		MessageQueueModule,
-		RepositoryModule,
-		PillManageModule,
-		UserManageModule,
 		AlertModule,
+		PillModule,
+		UserModule,
 		PushModule,
 	],
 	providers: [

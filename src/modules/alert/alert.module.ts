@@ -1,19 +1,26 @@
-import { MessageQueueModule } from '@modules/message_queue';
-import { AlertTime } from '@modules/repo/entity/alert-time.entity';
-import { Job } from '@modules/repo/entity/job.entity';
-import { BullModule } from '@nestjs/bull';
+import { AlertBullModule } from '@modules/alert-bull';
+import { PillModule } from '@modules/pill';
+import { TakingLogModule } from '@modules/taking-log';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlertTime } from 'src/entity/alert-time.entity';
+
+import { PushModule } from '../push';
+import { AlertConsumer } from './alert.consumer';
+import { AlertController } from './alert.controller';
+import { AlertRepository } from './alert.repository';
 import { AlertService } from './alert.service';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([AlertTime, Job]),
-		BullModule.registerQueue({
-			name: 'message',
-		}),
+		PushModule,
+		AlertBullModule,
+		PillModule,
+		TakingLogModule,
+		TypeOrmModule.forFeature([AlertTime]),
 	],
-	providers: [AlertService],
-	exports: [AlertService],
+	controllers: [AlertController],
+	providers: [AlertService, AlertConsumer, AlertRepository],
+	exports: [AlertService, AlertRepository],
 })
 export class AlertModule {}
