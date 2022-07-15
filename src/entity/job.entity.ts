@@ -12,13 +12,6 @@ export class Job {
 	isPush: boolean;
 	@Column({
 		type: 'text',
-		name: 'bullId',
-		nullable: true,
-	})
-	bullId: string;
-
-	@Column({
-		type: 'text',
 		name: 'firebasetoken',
 	})
 	firebasetoken: string;

@@ -1,4 +1,4 @@
-import { Week } from '@modules/message_queue/dto/enums/week.enum';
+import { Week } from '@modules/alert/dto/enums/week.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('AlertTime')
