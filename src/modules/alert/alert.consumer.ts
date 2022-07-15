@@ -5,12 +5,11 @@ import { AlertDto } from '../../core/types/alert-dto';
 import { PushService } from '../push';
 
 @Processor('message')
-export class MessageQueueConsumer {
+export class AlertConsumer {
 	constructor(private readonly pushService: PushService) {}
 
 	@Process()
 	async handleTranscode(job: Job<AlertDto>) {
-		//todo : isPushed 처리하기
 		const { firebaseToken, pills } = job.data;
 		const title = `약 먹을 시간입니다.`;
 		let body = `복용해야할 약 목록은`;
@@ -24,7 +23,6 @@ export class MessageQueueConsumer {
 		});
 		body = `${body} 입니다`;
 		console.log(body);
-		// finished TODO: pills로 title, body 만들기
 		await this.pushService.push({
 			firebaseToken,
 			title: title,
@@ -32,12 +30,3 @@ export class MessageQueueConsumer {
 		});
 	}
 }
-
-//https://docs.nestjs.com/techniques/queues
-
-/*
-1. 약추가 (추가 수정 삭제)
-2. 약 리스트(월화수목금, 시간-type 지정)
-3. 최초가입시(닉네임, uuid)-->API키 반환
-- Firebase Push 통신 방법 알아보기(FCM)
-*/
