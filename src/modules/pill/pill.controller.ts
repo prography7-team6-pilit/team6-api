@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@modules/user/user.guard';
 import {
 	Body,
 	Controller,
@@ -6,7 +7,6 @@ import {
 	Query,
 	Req,
 	Res,
-	UseFilters,
 	UseGuards,
 	ValidationPipe,
 } from '@nestjs/common';
@@ -18,22 +18,21 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { EatRequestDto } from './dto/eat.request.post.dto';
-import { PillManageService } from './pill_manage.service';
-import { EatResponseDto } from './dto/eat.response.post.dto';
-import { JwtAuthGuard } from '@modules/user_manage/user_manage.guard';
 import { EatResponseMonthDto } from './dto/eat.response.month.dto';
+import { EatResponseDto } from './dto/eat.response.post.dto';
+import { PillService } from './pill.service';
 
 @Controller({
 	version: '1',
 	path: 'pills',
 })
 @ApiTags('약 관련 API')
-export class PillManageController {
-	constructor(private readonly pillService: PillManageService) {}
+export class PillController {
+	constructor(private readonly pillService: PillService) {}
 
 	@ApiBearerAuth('access-token')
 	@ApiOperation({
-		summary: '월별 섭취 정보(캘린더)',
+		summary: '월별 섭취 정보',
 		description:
 			'state는 총 두가지로 표현되며 [ 미완료(1), 완료(2) ] 데이터가 없는 날은 날짜가 나오지 않습니다. 복용여부가 없으면 값이 반환되지 않습니다.',
 	})
@@ -56,7 +55,7 @@ export class PillManageController {
 	}
 
 	@ApiBearerAuth('access-token')
-	@ApiOperation({ summary: '약 복용 여부 구현완료' })
+	@ApiOperation({ summary: '약 복용 여부' })
 	@ApiCreatedResponse({
 		description: '복용이 안되어있는데 True, 체크해제되면 False',
 		type: EatResponseDto,

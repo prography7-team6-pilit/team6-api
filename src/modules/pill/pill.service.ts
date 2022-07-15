@@ -1,21 +1,30 @@
-import { Week } from '@modules/message_queue/dto/enums/week.enum';
-import { JobResponsePostDto } from '@modules/message_queue/dto/job.response.post.dto';
-import { DayTakingLog } from '@modules/repo/entity/day-taking-log.entity';
-import { Eat } from '@modules/repo/entity/eat.entity';
-import { RepositoryService } from '@modules/repo/repo.service';
+import { AlertRepository } from '@modules/alert/alert.repository';
+import { JobResponsePostDto } from '@modules/alert/dto/job.response.post.dto';
+import { TakingLogRepository } from '@modules/taking-log/taking-log.repository';
 import { Injectable } from '@nestjs/common';
+import { DayTakingLog } from 'src/entity/day-taking-log.entity';
+import { Eat } from 'src/entity/eat.entity';
 
 import { EatRequestDto } from './dto/eat.request.post.dto';
 import { EatResponseMonthDto } from './dto/eat.response.month.dto';
 import { EatResponseMonthUnitDto } from './dto/eat.response.month.unit.dto';
+import { PillRepository } from './pill.repository';
 
 @Injectable()
-export class PillManageService {
-	constructor(private readonly repo: RepositoryService) {}
+export class PillService {
+	constructor(
+		private readonly pillRepository: PillRepository,
+		private readonly takingLogRepository: TakingLogRepository,
+		private readonly alertRepository: AlertRepository,
+	) {}
 
 	async getMonthPill(userId: number, year: number, month: number) {
 		let result: EatResponseMonthDto = { takelogs: [] };
-		const monthDatas = await this.repo.getMonthData(userId, year, month);
+		const monthDatas = await this.pillRepository.getMonthData(
+			userId,
+			year,
+			month,
+		);
 		monthDatas.forEach((status) => {
 			const monthData: EatResponseMonthUnitDto = {
 				eatDate: status.date.toString(),
@@ -32,7 +41,7 @@ export class PillManageService {
 		requestDto: EatRequestDto,
 		userId: number,
 	): Promise<JobResponsePostDto | undefined> {
-		const isTaked = await this.repo.isTaked(requestDto.alertId);
+		const isTaked = await this.takingLogRepository.isTaked(requestDto.alertId);
 		if (!isTaked) {
 			const eat: Eat = {
 				eatId: 0,
@@ -40,12 +49,12 @@ export class PillManageService {
 				alertId: requestDto.alertId,
 				eatDate: new Date(new Date().toLocaleDateString()),
 			};
-			await this.repo.addPill(eat);
+			await this.takingLogRepository.addPill(eat);
 			await this.setStatus(userId);
 			return { result: true };
 		}
 
-		const result = await this.repo.putPill(isTaked.eatId);
+		const result = await this.takingLogRepository.putPill(isTaked.eatId);
 		if (result.affected! > 0) {
 			await this.setStatus(userId);
 			return { result: false };
@@ -55,8 +64,11 @@ export class PillManageService {
 	async setStatus(userId: number): Promise<boolean> {
 		const now = new Date();
 		const nowDate = new Date(now.toLocaleDateString());
-		const todayLogs = await this.repo.getTodayJob(userId, nowDate);
-		const eatLogs = await this.repo.getTakeOrNotByDay(userId, nowDate);
+		const todayLogs = await this.alertRepository.getTodayJob(userId, nowDate);
+		const eatLogs = await this.takingLogRepository.getTakeOrNotByDay(
+			userId,
+			nowDate,
+		);
 		const todayLogsCount = todayLogs.length;
 		const eatLogsCount = eatLogs.length;
 		let takeStatusCode = 2;
@@ -73,7 +85,7 @@ export class PillManageService {
 			takeStatus: takeStatusCode,
 		};
 
-		const result = await this.repo.dayTakingLog(userId, dayTakingLog);
+		const result = await this.pillRepository.dayTakingLog(userId, dayTakingLog);
 		return true;
 	}
 }
