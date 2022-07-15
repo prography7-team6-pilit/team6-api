@@ -6,7 +6,6 @@ import {
 	Post,
 	Query,
 	Res,
-	UseFilters,
 } from '@nestjs/common';
 import {
 	ApiCreatedResponse,
@@ -16,18 +15,18 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { UserRequestDto } from './dto/user.request.dto';
 import { UserResponseDto } from './dto/user.reponse.dto';
-import { UserManageService } from './user_manage.service';
+import { UserRequestDto } from './dto/user.request.dto';
 import { UserRequestGetDto } from './dto/user.response.get.dto';
+import { UserService } from './user.service';
 
 @Controller({
 	version: '1',
 	path: 'users',
 })
 @ApiTags('사용자 관련 API')
-export class UserManageController {
-	constructor(private readonly userService: UserManageService) {}
+export class UserController {
+	constructor(private readonly userService: UserService) {}
 
 	@ApiOperation({
 		summary: '계정 불러오기',

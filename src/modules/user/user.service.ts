@@ -1,18 +1,17 @@
-import { User } from '@modules/repo/entity/user.entity';
-import { RepositoryService } from '@modules/repo/repo.service';
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRequestDto } from './dto/user.request.dto';
+import { userRepository } from './user.repository';
 
 @Injectable()
-export class UserManageService {
+export class UserService {
 	constructor(
 		private readonly jwtService: JwtService,
-		private readonly repo: RepositoryService,
+		private readonly userRepository: userRepository,
 	) {}
 
 	async signIn(uuid: string) {
-		const result = await this.repo.getNickname(uuid);
+		const result = await this.userRepository.getNickname(uuid);
 		if (!result) {
 			return;
 		}
@@ -21,13 +20,13 @@ export class UserManageService {
 		return accessToken;
 	}
 	async signUp(userDto: UserRequestDto): Promise<string> {
-		const result = await this.repo.setNickname(
+		const result = await this.userRepository.setNickname(
 			userDto.uuid,
 			userDto.nickname,
 			userDto.firebasetoken,
 		);
 		const payload = { ...result };
-		const accessToken = await this.jwtService.sign(payload);
+		const accessToken = this.jwtService.sign(payload);
 		return accessToken;
 	}
 }
