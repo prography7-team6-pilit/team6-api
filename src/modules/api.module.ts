@@ -38,6 +38,7 @@ import { UserModule } from './user';
 		PillModule,
 		UserModule,
 		PushModule,
+		BullModule,
 	],
 	providers: [
 		{
