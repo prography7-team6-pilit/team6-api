@@ -1,11 +1,10 @@
 import { Env } from '@config/env';
-import { TransformResponseInterceptor } from '@core/interceptors';
 import { setupSwagger } from '@core/setup';
 import {
 	RequestMethod,
 	ValidationPipe,
-	VERSION_NEUTRAL,
 	VersioningType,
+	VERSION_NEUTRAL,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -33,7 +32,6 @@ async function bootstrap() {
 			},
 		}),
 	);
-	app.useGlobalInterceptors(new TransformResponseInterceptor());
 	app.enableVersioning({
 		type: VersioningType.URI,
 		defaultVersion: VERSION_NEUTRAL,
@@ -51,5 +49,9 @@ async function bootstrap() {
 }
 bootstrap();
 
-//알림 수정과정 리펙토링(alertId 변경안되게)
-//statusCode 처리하기
+function expressBasicAuth(arg0: {
+	users: { pilit: string };
+	challenge: boolean;
+}): any {
+	throw new Error('Function not implemented.');
+}
