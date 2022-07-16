@@ -11,6 +11,7 @@ import { DayTakingLog } from '../entity/day-taking-log.entity';
 import { Eat } from '../entity/eat.entity';
 import { Job } from '../entity/job.entity';
 import { User } from '../entity/user.entity';
+import { BullManageModule } from './bull-manage';
 import { PillModule } from './pill/pill.module';
 import { PushModule } from './push';
 import { UserModule } from './user';
@@ -38,6 +39,8 @@ import { UserModule } from './user';
 		PillModule,
 		UserModule,
 		PushModule,
+		BullModule,
+		BullManageModule,
 	],
 	providers: [
 		{
