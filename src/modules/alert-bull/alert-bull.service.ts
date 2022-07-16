@@ -62,7 +62,7 @@ export class AlertBullService {
 	}
 
 	async removeJob(bullId: Bull.JobId, pillId: number) {
-		this.alertQueue.getJob(bullId).then(async (job) => {
+		await this.alertQueue.getJob(bullId).then(async (job) => {
 			const pillData = job!.data.pills;
 			const firebaseToken = job!.data.firebaseToken;
 			const idx = pillData.findIndex(function (item) {
@@ -80,6 +80,24 @@ export class AlertBullService {
 				});
 			}
 		});
+	}
+	async removeAllJob() {
+		const jobs = await this.alertQueue.getJobs([
+			'active',
+			'waiting',
+			'delayed',
+			'completed',
+		]);
+		for (const job of jobs) {
+			await job.remove();
+		}
+		const afterRemoveJobs = await this.alertQueue.getJobs([
+			'active',
+			'waiting',
+			'delayed',
+			'completed',
+		]);
+		return `BeforeRemove ---- ${jobs}\nAfterRemove ---- ${afterRemoveJobs}`;
 	}
 
 	private async getBullIdByAlertTime(
