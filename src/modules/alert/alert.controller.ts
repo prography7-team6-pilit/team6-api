@@ -75,6 +75,7 @@ export class AlertController {
 			firebasetoken,
 			requestData.dosage,
 		);
+		await this.alertService.refreshStatus(userId);
 		return { result: saveJob };
 	}
 
@@ -113,6 +114,7 @@ export class AlertController {
 			jobAlertData.pillName,
 			jobAlertData.isPush,
 		);
+		await this.alertService.refreshStatus(userId);
 		return { result: true };
 	}
 
@@ -128,9 +130,12 @@ export class AlertController {
 		@Req() req: Request,
 	) {
 		const userId = req.user!.userId;
-		return await this.alertService.softDeletePillAlert(
+		const result = await this.alertService.softDeletePillAlert(
 			userId,
 			requestDeleteData.alertId,
 		);
+		await this.alertService.deleteTakingLog(requestDeleteData.alertId, userId);
+		await this.alertService.refreshStatus(userId);
+		return { result: result };
 	}
 }

@@ -1,6 +1,6 @@
 import { Week } from '@modules/alert/dto/enums/week.enum';
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Bull, { Queue } from 'bull';
 import { AlertTime } from 'src/entity/alert-time.entity';
@@ -40,6 +40,9 @@ export class AlertBullService {
 		const bullId = await this.getBullIdByAlertTime(weekday, time, userId);
 		if (bullId) {
 			await this.alertQueue.getJob(bullId).then(async (job) => {
+				if (!job) {
+					throw new HttpException('서버 초기화가 필요합니다', 500);
+				}
 				let pillData = job!.data.pills;
 				pillData.push({ name: pillName, pillId: pillId });
 				await job!.update({

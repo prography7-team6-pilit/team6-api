@@ -87,10 +87,13 @@ export class AlertRepository {
 
 	async getTodayJob(userId: number, nowDate: Date) {
 		const now = this.dayToweek(nowDate.getDay());
-		return await this.alertTimeRepository.find({
-			week: now,
-			userId,
-		});
+		const job = await this.alertTimeRepository
+			.createQueryBuilder()
+			.where('week=:now', { now })
+			.andWhere('userId=:userId', { userId })
+			.groupBy('pillId')
+			.getMany();
+		return job;
 	}
 
 	async getAlerts(pillId: number) {

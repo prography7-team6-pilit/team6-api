@@ -1,10 +1,10 @@
 import { AlertBullService } from '@modules/alert-bull';
 import { PillRepository } from '@modules/pill/pill.repository';
+import { PillService } from '@modules/pill/pill.service';
 import { TakingLogRepository } from '@modules/taking-log/taking-log.repository';
 import { HttpException, Injectable } from '@nestjs/common';
 import { AlertRepository } from './alert.repository';
 import { Week } from './dto/enums/week.enum';
-import { JobResponseDto } from './dto/job.response.dto';
 import { JobResponseGetDto } from './dto/job.response.get.dto';
 import { JobResponseUnitGetDto } from './dto/job.response.get.unit.dto';
 
@@ -15,6 +15,7 @@ export class AlertService {
 		private alertRepository: AlertRepository,
 		private pillRepository: PillRepository,
 		private takinglogRepository: TakingLogRepository,
+		private pillService: PillService,
 	) {}
 
 	async getPillAlert(
@@ -194,16 +195,22 @@ export class AlertService {
 		return alertTime;
 	}
 
-	async softDeletePillAlert(
-		userId: number,
-		alertId: number,
-	): Promise<JobResponseDto> {
+	async softDeletePillAlert(userId: number, alertId: number): Promise<boolean> {
 		const alertTimes = await this.alertRepository.getAlerts(alertId);
 		for (const alertTime of alertTimes) {
 			await this.alertBullService.removeJob(alertTime.bullId, alertTime.pillId);
 		}
 		await this.alertRepository.removeAlertTiemByPillId(alertId);
+		await this.deleteTakingLog(alertId, userId);
 		const data = await this.pillRepository.softDelJob(userId, alertId);
-		return { result: Boolean(data) };
+
+		return Boolean(data);
+	}
+
+	async deleteTakingLog(alertId: number, userId: number) {
+		await this.takinglogRepository.removeTakingLog(alertId, userId);
+	}
+	async refreshStatus(userId: number) {
+		await this.pillService.setStatus(userId);
 	}
 }
