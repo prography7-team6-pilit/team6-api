@@ -21,10 +21,10 @@ export class TakingLogRepository {
 		});
 	}
 
-	async getTakeOrNotByDay(userId: number, onlyDate: Date): Promise<Eat[]> {
+	async getTakeOrNotByDay(userId: number, nowDate: Date): Promise<Eat[]> {
 		return await this.eatRepository.find({
 			userId: userId,
-			eatDate: onlyDate,
+			eatDate: nowDate,
 		});
 	}
 	async addPill(eat: Eat) {
@@ -38,5 +38,14 @@ export class TakingLogRepository {
 	async isTaked(alertId: number): Promise<Eat | undefined> {
 		const now_data = new Date(new Date().toLocaleDateString());
 		return await this.eatRepository.findOne({ alertId, eatDate: now_data });
+	}
+	async removeTakingLog(alertId: number, userId: number) {
+		const now_data = new Date(new Date().toLocaleDateString());
+		const takinglog = await this.eatRepository.find({
+			alertId,
+			userId,
+			eatDate: now_data,
+		});
+		return await this.eatRepository.remove(takinglog);
 	}
 }
