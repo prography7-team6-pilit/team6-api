@@ -98,4 +98,14 @@ export class PillRepository {
 		);
 		return;
 	}
+	async removeDayTakingLog(userId: number, date: Date) {
+		const dayTakingLog = await this.dayTakingLogRepository.findOne({
+			userId,
+			date,
+		});
+		if (!dayTakingLog) {
+			return;
+		}
+		return await this.dayTakingLogRepository.remove(dayTakingLog);
+	}
 }

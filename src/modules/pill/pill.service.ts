@@ -41,6 +41,10 @@ export class PillService {
 		requestDto: EatRequestDto,
 		userId: number,
 	): Promise<JobResponsePostDto | undefined> {
+		const pillRemoved = await this.pillRepository.getJob(requestDto.alertId);
+		if (pillRemoved!.IsRemoved) {
+			return { result: false };
+		}
 		const isTaked = await this.takingLogRepository.isTaked(requestDto.alertId);
 		if (!isTaked) {
 			const eat: Eat = {
@@ -71,21 +75,24 @@ export class PillService {
 		);
 		const todayLogsCount = todayLogs.length;
 		const eatLogsCount = eatLogs.length;
-		let takeStatusCode = 2;
-		if (eatLogsCount === 0) {
-			takeStatusCode = 0;
-		} else if (todayLogsCount > eatLogsCount) {
-			takeStatusCode = 1;
+		console.log(todayLogsCount, eatLogsCount);
+		let takeStatus = 2;
+		if (todayLogsCount == 0) {
+			await this.pillRepository.removeDayTakingLog(userId, nowDate);
+			return true;
+		}
+		if (todayLogsCount > eatLogsCount) {
+			takeStatus = 1;
 		}
 
 		const dayTakingLog: DayTakingLog = {
 			id: 0,
 			date: new Date(new Date().toLocaleDateString()),
 			userId: userId,
-			takeStatus: takeStatusCode,
+			takeStatus,
 		};
 
-		const result = await this.pillRepository.dayTakingLog(userId, dayTakingLog);
+		await this.pillRepository.dayTakingLog(userId, dayTakingLog);
 		return true;
 	}
 }
