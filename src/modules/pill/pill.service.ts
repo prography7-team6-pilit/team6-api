@@ -77,7 +77,7 @@ export class PillService {
 		const eatLogsCount = eatLogs.length;
 		console.log(todayLogsCount, eatLogsCount);
 		let takeStatus = 2;
-		if (todayLogsCount == 0) {
+		if (eatLogsCount == 0) {
 			await this.pillRepository.removeDayTakingLog(userId, nowDate);
 			return true;
 		}
