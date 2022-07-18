@@ -19,6 +19,7 @@ export class userRepository {
 		firebasetoken: string,
 	): Promise<User> {
 		const userEntity = this.userRepository.create({
+			userId: this.randomNumber(),
 			uuid,
 			nickname,
 			firebasetoken,
@@ -30,5 +31,12 @@ export class userRepository {
 			throw new HttpException('존재하는 UUID 입니다.', 403);
 		}
 		return await this.userRepository.save(userEntity);
+	}
+	private randomNumber(): number {
+		let str = '';
+		for (let i = 0; i < 8; i++) {
+			str += Math.floor(Math.random() * 10);
+		}
+		return Number(str);
 	}
 }

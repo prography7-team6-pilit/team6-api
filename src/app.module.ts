@@ -1,6 +1,8 @@
 import { HealthCheckModule } from '@kiwi-lib/nestjs';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppLoggerMiddleware } from './log.interceptor';
 import { ApiModule } from './modules';
 
@@ -10,6 +12,9 @@ import { ApiModule } from './modules';
 			isGlobal: true,
 			envFilePath: '.env',
 			cache: true,
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', 'public'),
 		}),
 		HealthCheckModule,
 		ApiModule,

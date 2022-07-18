@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { ConsoleLogger, Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 
 interface PushParams {
 	firebaseToken: string;
@@ -16,12 +16,15 @@ export class PushService {
 			notification: {
 				title: title,
 				body: body,
+				icon: 'https://team6-api.prography.org/img/pilit.png',
 			},
 			data: {
 				title: title,
 				body: body,
+				icon: 'https://team6-api.prography.org/img/pilit.png',
 			},
 			to: firebaseToken,
+			priority: 'high',
 		};
 		this.logger.log('메세지전송', payload);
 		console.log('메세지전송', payload);
