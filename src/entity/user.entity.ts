@@ -1,12 +1,5 @@
 import { MaxLength } from 'class-validator';
-import {
-	Column,
-	Entity,
-	Generated,
-	OneToMany,
-	PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Job } from './job.entity';
+import { Column, Entity, Generated, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('User')
 export class User {
