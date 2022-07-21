@@ -18,13 +18,21 @@ export class userRepository {
 		nickname: string,
 		firebasetoken: string,
 	): Promise<User> {
-		const userEntity = this.userRepository.create({
-			userId: this.randomNumber(),
-			uuid: `${uuid}-${this.randomNumber()}`,
+		const user = await this.getNickname(uuid);
+		if (!user) {
+			return await this.userRepository.save({
+				userId: this.randomNumber(),
+				uuid: uuid,
+				nickname,
+				firebasetoken,
+			});
+		}
+		return await this.userRepository.save({
+			userId: user.userId,
+			uuid: user.uuid,
 			nickname,
 			firebasetoken,
 		});
-		return await this.userRepository.save(userEntity);
 	}
 	private randomNumber(): number {
 		let str = '';
