@@ -48,15 +48,16 @@ export class UserController {
 	})
 	@Get('/login')
 	async getUser(@Query() requestData: UserRequestGetDto, @Res() res: Response) {
-		const accessToken = await this.userService.signIn(requestData.uuid);
-		if (!accessToken) {
+		const user = await this.userService.signIn(requestData.uuid);
+		if (!user) {
 			throw new HttpException('잘못된 인증입니다', 403);
 		}
 		const userResponse: UserResponseDto = {
-			accessToken: accessToken,
+			accessToken: user.accessToken,
+			nickname: user.nickname,
 			result: true,
 		};
-		return res.header('accessToken', accessToken).json(userResponse);
+		return res.header('accessToken', user.accessToken).json(userResponse);
 	}
 
 	@ApiOperation({ summary: '계정 등록' })
@@ -70,13 +71,15 @@ export class UserController {
 	})
 	@Post('/join')
 	async setUser(@Body() userDto: UserRequestDto, @Res() res: Response) {
-		const accessToken = await this.userService.signUp(userDto);
-		if (accessToken) {
-			const userResponse: UserResponseDto = {
-				accessToken: accessToken,
-				result: true,
-			};
-			return res.header('accessToken', accessToken).json(userResponse);
+		const user = await this.userService.signUp(userDto);
+		if (!user) {
+			throw new HttpException('입력정보가 올바르지 않습니다', 400);
 		}
+		const userResponse: UserResponseDto = {
+			accessToken: user.accessToken,
+			nickname: user.nickname,
+			result: true,
+		};
+		return res.header('accessToken', user.accessToken).json(userResponse);
 	}
 }
