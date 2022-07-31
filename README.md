@@ -20,6 +20,6 @@
 
 |Server|Server|Design|Design|
 |:---:|:---:|:---:|:---:|
-|![image](https://user-images.githubusercontent.com/56428918/182009710-3c756a17-f77d-4025-818d-fdf3accc67c5.png)|![image](https://user-images.githubusercontent.com/56428918/182009827-a99fe126-8d63-4008-9769-f654ec8c4c45.png)|![image](https://user-images.githubusercontent.com/56428918/182009851-1cca62bc-cb9b-4a41-a554-24e60d17731b.png)|temp|
+|![image](https://user-images.githubusercontent.com/56428918/182009710-3c756a17-f77d-4025-818d-fdf3accc67c5.png)|![image](https://user-images.githubusercontent.com/56428918/182009827-a99fe126-8d63-4008-9769-f654ec8c4c45.png)|![image](https://user-images.githubusercontent.com/56428918/182009851-1cca62bc-cb9b-4a41-a554-24e60d17731b.png)|![image](https://user-images.githubusercontent.com/56428918/182011963-30b3367c-6cb9-40e9-a18c-d3297443c6b9.png)|
 |이재준|장지훈|배성진|안재원|
-|https://github.com/Linho1150|https://github.com/WhiteKiwi|https://github.com/bbaesungjin|temp|
+|https://github.com/Linho1150|https://github.com/WhiteKiwi|https://github.com/bbaesungjin|https://jaewonan.myportfolio.com|
